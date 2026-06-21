@@ -49,7 +49,46 @@ VN100_FALLBACK = [
     "BVH","PVI","BMI","ABI","MIG","PTI","VNR","BIC","PRE","PGI",
 ]
 
-# Chỉ số cơ bản tham chiếu (BCTC 2025)
+SECTOR_MAP = {
+    "VCB":"Ngân hàng","BID":"Ngân hàng","CTG":"Ngân hàng","MBB":"Ngân hàng",
+    "TCB":"Ngân hàng","ACB":"Ngân hàng","STB":"Ngân hàng","VPB":"Ngân hàng",
+    "HDB":"Ngân hàng","VIB":"Ngân hàng","MSB":"Ngân hàng","LPB":"Ngân hàng",
+    "SHB":"Ngân hàng","OCB":"Ngân hàng","TPB":"Ngân hàng","SSB":"Ngân hàng",
+    "VIC":"Bất động sản","VHM":"Bất động sản","NVL":"Bất động sản",
+    "PDR":"Bất động sản","DXG":"Bất động sản","KDH":"Bất động sản",
+    "BCM":"Bất động sản","VRE":"Bất động sản","DIG":"Bất động sản",
+    "NLG":"Bất động sản","HDC":"Bất động sản","CII":"Bất động sản",
+    "SSI":"Chứng khoán","VND":"Chứng khoán","HCM":"Chứng khoán",
+    "MBS":"Chứng khoán","CTS":"Chứng khoán","BSI":"Chứng khoán",
+    "FTS":"Chứng khoán","VCI":"Chứng khoán",
+    "HPG":"Thép & Vật liệu","HSG":"Thép & Vật liệu","NKG":"Thép & Vật liệu",
+    "TLH":"Thép & Vật liệu","SMC":"Thép & Vật liệu",
+    "FPT":"Công nghệ","CMG":"Công nghệ","ELC":"Công nghệ",
+    "GAS":"Dầu khí","PLX":"Dầu khí","PVD":"Dầu khí","PVS":"Dầu khí",
+    "BSR":"Dầu khí","OIL":"Dầu khí",
+    "VNM":"Tiêu dùng","MWG":"Bán lẻ","MSN":"Tiêu dùng","SAB":"Tiêu dùng",
+    "MCH":"Tiêu dùng","KDC":"Tiêu dùng",
+    "HVN":"Hàng không","VJC":"Hàng không","ACV":"Hàng không",
+    "GMD":"Vận tải","PVT":"Vận tải","HAH":"Vận tải","VSC":"Vận tải",
+    "POW":"Năng lượng","NT2":"Năng lượng","GEG":"Năng lượng",
+    "REE":"Năng lượng","PPC":"Năng lượng","VSH":"Năng lượng",
+    "BVH":"Bảo hiểm","PVI":"Bảo hiểm","BMI":"Bảo hiểm",
+}
+NAME_MAP = {
+    "VCB":"Vietcombank","BID":"BIDV","CTG":"VietinBank","MBB":"MB Bank",
+    "TCB":"Techcombank","ACB":"ACB","STB":"Sacombank","VPB":"VPBank",
+    "HDB":"HDBank","VIB":"VIB","MSB":"MSB","LPB":"LPBank","SHB":"SHB",
+    "OCB":"OCB","TPB":"TPBank","SSB":"SeABank",
+    "VIC":"Vingroup","VHM":"Vinhomes","NVL":"Novaland","PDR":"Phát Đạt",
+    "DXG":"Đất Xanh","KDH":"Khang Điền","BCM":"Becamex","VRE":"Vincom Retail",
+    "SSI":"SSI","VND":"VNDIRECT","HCM":"HSC","MBS":"MBSecurities",
+    "HPG":"Hòa Phát","HSG":"Hoa Sen","NKG":"Nam Kim",
+    "FPT":"FPT","CMG":"CMC","GAS":"PV Gas","PLX":"Petrolimex",
+    "PVD":"PV Drilling","PVS":"PV Technical",
+    "VNM":"Vinamilk","MWG":"Thế Giới Di Động","MSN":"Masan","SAB":"Sabeco",
+    "HVN":"Vietnam Airlines","VJC":"Vietjet","ACV":"Sân bay ACV",
+    "GMD":"Gemadept","POW":"PV Power","REE":"REE Corp","BVH":"Bảo Việt",
+}
 FALLBACK_FUND = {
     "VCB":{"pe":13.2,"pb":2.8,"roe":0.195,"roa":0.016,"eps":6820,"eps_growth":0.12},
     "BID":{"pe":10.1,"pb":1.5,"roe":0.142,"roa":0.007,"eps":4120,"eps_growth":0.18},
@@ -320,27 +359,40 @@ def main():
                 print("ít dữ liệu, bỏ")
                 continue
 
-            # Lọc thanh khoản
+            # Lọc thanh khoản — vnstock 4.x trả giá đơn vị nghìn đồng
             sc = df["close"].values[-20:] if len(df)>=20 else df["close"].values
             sv = df["volume"].values[-20:] if len(df)>=20 else df["volume"].values
-            gtgd = float(np.mean(sc.astype(float)*sv.astype(float))/1e9)
+            price_scale = 1000.0 if float(np.median(sc)) < 1000 else 1.0
+            gtgd = float(np.mean(sc.astype(float)*price_scale*sv.astype(float))/1e9)
             if gtgd < LIQ_MIN_BILLION:
-                print(f"GTGD {gtgd:.1f}tỷ < {LIQ_MIN_BILLION}tỷ, bỏ")
+                print(f"GTGD {gtgd:.0f}tỷ < {LIQ_MIN_BILLION}tỷ, bỏ")
                 time.sleep(INTER_DELAY); continue
 
+            # Scale giá về đơn vị đồng trước khi tính tín hiệu
+            df_scaled = df.copy()
+            if price_scale > 1:
+                for col in ("open","high","low","close"):
+                    df_scaled[col] = df_scaled[col] * price_scale
+
             # Tính tín hiệu
-            sig = compute_signals(df)
+            sig = compute_signals(df_scaled)
             if sig is None:
                 print("chưa đủ chỉ báo, bỏ")
                 time.sleep(INTER_DELAY); continue
+
+            # Ghi đè gtgd đã tính đúng vào sig
+            sig["gtgd_bn"] = round(gtgd, 1)
 
             # Cơ bản
             fund = FALLBACK_FUND.get(sym, {})
 
             signals[sym]      = sig
-            stocks[sym]       = series(df)
+            stocks[sym]       = series(df_scaled)
             fundamentals[sym] = fund
-            universe[sym]     = {"name": sym, "sector": ""}
+            universe[sym]     = {
+                "name":   NAME_MAP.get(sym, sym),
+                "sector": SECTOR_MAP.get(sym, "Khác"),
+            }
             ok_price += 1
             print(f"✔ {sig['signal']:4s} score={sig['score']:+.3f} "
                   f"GTGD={gtgd:.0f}tỷ")
