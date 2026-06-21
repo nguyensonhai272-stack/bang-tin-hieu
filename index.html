@@ -1,139 +1,77 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOSE Signal Cockpit</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HOSE Signal — VN100</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:#2A323D;
-  --text:#E8EAED;--muted:#8B94A3;
-  --accent:#4FD1C5;--line:#6AB7FF;--amber:#E0A23C;
-  --buy:#2DBE8B;--sell:#E5484D;--hold:#E0A23C;
-  --r:10px;
-  --disp:'Space Grotesk',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --body:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.55}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-h2{font-family:var(--disp);font-weight:600;margin:0;font-size:18px;letter-spacing:-.2px}
-.muted{color:var(--muted);font-size:12.5px}.small{font-size:11.5px}
-
-/* layout */
-.app{display:grid;grid-template-columns:212px 1fr;min-height:100vh}
-.side{background:var(--panel);border-right:1px solid var(--border);padding:18px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
-.brand{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:-.3px;margin-bottom:2px}
-.brand .dot{color:var(--accent)}
-.brand-sub{font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.4}
-.nav{display:flex;flex-direction:column;gap:3px}
-.nav button{display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--muted);font-family:var(--body);font-size:13.5px;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;transition:.12s}
-.nav button:hover{background:var(--panel2);color:var(--text)}
-.nav button.on{background:var(--panel2);color:var(--text);box-shadow:inset 2px 0 0 var(--accent)}
-.nav .ic{width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.6}
-.side-foot{margin-top:auto;font-size:10.5px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:12px}
-.demo-badge{display:inline-block;background:rgba(224,162,60,.13);color:var(--amber);border:1px solid rgba(224,162,60,.3);border-radius:6px;padding:3px 8px;font-size:10.5px;font-weight:500;margin-bottom:8px}
+:root{--bg:#0E1116;--panel:#161B22;--panel2:#1C232C;--border:#2A323D;--text:#E8EAED;--muted:#8B94A3;--accent:#4FD1C5;--line:#6AB7FF;--amber:#E0A23C;--buy:#2DBE8B;--sell:#E5484D;--hold:#E0A23C;--r:10px;--disp:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;--body:system-ui,-apple-system,sans-serif;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:14px;line-height:1.55}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}h2{font-family:var(--disp);font-weight:600;margin:0;font-size:18px}.muted{color:var(--muted);font-size:12.5px}.small{font-size:11.5px}
+.app{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.side{background:var(--panel);border-right:1px solid var(--border);padding:16px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.brand{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:-.3px;margin-bottom:1px}.brand .dot{color:var(--accent)}.brand-sub{font-size:10.5px;color:var(--muted);margin-bottom:16px;line-height:1.4}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--muted);font-family:var(--body);font-size:13px;text-align:left;padding:9px 11px;border-radius:7px;cursor:pointer;transition:.12s}
+.nav button:hover{background:var(--panel2);color:var(--text)}.nav button.on{background:var(--panel2);color:var(--text);box-shadow:inset 2px 0 0 var(--accent)}.nav .ic{width:7px;height:7px;border-radius:2px;background:currentColor;opacity:.6}
+.side-foot{margin-top:auto;font-size:10px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:10px}
+.demo-badge{display:inline-block;background:rgba(224,162,60,.13);color:var(--amber);border:1px solid rgba(224,162,60,.3);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:500;margin-bottom:6px}
 .demo-badge.real{background:rgba(45,190,139,.13);color:var(--buy);border-color:rgba(45,190,139,.3)}
-.main{padding:22px 26px 60px;max-width:1200px}
+.main{padding:20px 22px 60px;max-width:1280px}
 .view{display:none}.view.show{display:block}
-.row-between{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px}
-
+.row-between{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
 /* table */
-table.grid{width:100%;border-collapse:collapse;font-size:13px}
-table.grid th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:0 10px 10px;border-bottom:1px solid var(--border)}
-table.grid td{padding:10px 10px;border-bottom:1px solid var(--border)}
-table.grid tbody tr{cursor:pointer;transition:.1s}
-table.grid tbody tr:hover{background:var(--panel2)}
-.t-sym{font-family:var(--disp);font-weight:600;font-size:14px}
-.t-name{font-size:11px;color:var(--muted)}
-.t-reason{color:var(--muted);font-size:12px;max-width:160px}
-.sector-tag{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:10px;margin-left:4px;color:var(--muted)}
-
-/* badges */
-.badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:600;font-family:var(--disp)}
-.badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}
-.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}
-.badge.hold{background:rgba(224,162,60,.13);color:var(--hold)}
-.fund-grade-sm{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11.5px;font-weight:700;border:1px solid transparent}
-
-/* seg */
-.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:2px}
-.seg.sm button{font-size:11.5px;padding:4px 9px}
-.seg button{background:none;border:none;color:var(--muted);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:12.5px;font-family:var(--body)}
-.seg button.on{background:var(--accent);color:#06231f;font-weight:600}
-.sel{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--body);font-size:13px;min-width:220px}
-
-/* grid layouts */
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:0}
-.verdict{border-top:3px solid var(--border)}
-.verdict.buy{border-top-color:var(--buy)}.verdict.sell{border-top-color:var(--sell)}.verdict.hold{border-top-color:var(--hold)}
-.verdict-big{display:flex;align-items:center;gap:12px;margin:6px 0 14px}
-.vscore{font-size:22px;font-weight:500}
-.reasons{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.chip{background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--text)}
-
-/* fundamental */
-.fund-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.fund-grade{display:inline-block;padding:4px 14px;border-radius:8px;font-size:22px;font-weight:700;border:1px solid transparent;font-family:var(--disp)}
-.fund-desc{font-size:13px;color:var(--muted)}
-.fund-kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:8px;overflow:hidden}
-
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px}
+table.grid th{text-align:left;color:var(--muted);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:0 10px 9px;border-bottom:1px solid var(--border)}
+table.grid td{padding:9px 10px;border-bottom:1px solid var(--border)}
+table.grid tbody tr{cursor:pointer;transition:.1s}table.grid tbody tr:hover{background:var(--panel2)}
+.t-sym{font-family:var(--disp);font-weight:600;font-size:13.5px}.t-name{font-size:10.5px;color:var(--muted)}.t-reason{color:var(--muted);font-size:11.5px}.liq{color:var(--muted) !important}
+.sector-tag{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:10px;color:var(--muted)}
+.badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--disp)}
+.badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}
+.fund-grade-sm{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700}
+/* controls */
+.seg{display:inline-flex;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:2px}.seg.sm button{font-size:11px;padding:3px 8px}
+.seg button{background:none;border:none;color:var(--muted);padding:5px 11px;border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--body)}.seg button.on{background:var(--accent);color:#06231f;font-weight:600}
+.sel{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--body);font-size:12.5px;min-width:180px}
+.sel.sm{min-width:140px;padding:6px 10px;font-size:12px}
+.search-box{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-family:var(--body);font-size:12.5px;width:120px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+/* detail */
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:0}
+.verdict{border-top:3px solid var(--border)}.verdict.buy{border-top-color:var(--buy)}.verdict.sell{border-top-color:var(--sell)}.verdict.hold{border-top-color:var(--hold)}
+.verdict-big{display:flex;align-items:center;gap:10px;margin:6px 0 12px}.vscore{font-size:20px;font-weight:500}
+.fund-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}.fund-desc{font-size:12.5px;color:var(--muted)}
+.fund-kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:7px;overflow:hidden}
 /* meter */
-.meter{margin:4px 0}
-.meter-track{position:relative;height:10px;border-radius:6px;overflow:hidden;display:flex}
+.meter{margin:4px 0}.meter-track{position:relative;height:9px;border-radius:5px;overflow:hidden;display:flex}
 .meter-zone{height:100%}.z-sell{width:37.5%;background:rgba(229,72,77,.4)}.z-hold{width:25%;background:rgba(224,162,60,.35)}.z-buy{width:37.5%;background:rgba(45,190,139,.4)}
-.meter-mark{position:absolute;top:-3px;width:3px;height:16px;background:var(--text);border-radius:2px;transform:translateX(-50%);box-shadow:0 0 0 2px var(--panel)}
-.meter-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px}
-
-/* group bars */
-.gbars{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.gbar{display:grid;grid-template-columns:100px 1fr 40px;align-items:center;gap:8px}
-.gbar-name{font-size:11px}.gbar-w{color:var(--muted);font-size:10px}
-.gbar-track{position:relative;height:7px;background:var(--panel2);border-radius:4px}
-.gbar-mid{position:absolute;left:50%;top:-2px;width:1px;height:11px;background:var(--border)}
-.gbar-fill{position:absolute;top:0;height:7px;border-radius:4px}
-.gbar-val{font-family:var(--mono);font-size:10.5px;text-align:right}
-
-/* kpi */
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:8px;overflow:hidden}
-.kpi{background:var(--panel);padding:12px 14px}
-.kpi-l{font-size:11px;color:var(--muted)}.kpi-v{font-size:17px;margin:2px 0}.kpi-c{font-size:10.5px;color:var(--accent)}
-
-/* metrics */
-.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.metric{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 15px}
-.metric.buy{border-left:3px solid var(--buy)}.metric.sell{border-left:3px solid var(--sell)}
-.m-l{font-size:11px;color:var(--muted)}.m-v{font-size:20px;margin-top:3px}
-
-/* canvas */
-canvas{width:100%;display:block;margin:8px 0 4px;cursor:crosshair}
-.readout{font-family:var(--mono);font-size:11.5px;color:var(--muted);min-height:18px;padding:2px 0}
-.legend2{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
-.legend2 i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
-
-/* sự kiện */
-.sev{font-weight:500}
+.meter-mark{position:absolute;top:-3px;width:3px;height:15px;background:var(--text);border-radius:2px;transform:translateX(-50%);box-shadow:0 0 0 2px var(--panel)}
+.meter-labels{display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:5px}
+.gbars{display:flex;flex-direction:column;gap:5px;margin-top:10px}
+.gbar{display:grid;grid-template-columns:100px 1fr 38px;align-items:center;gap:7px}
+.gbar-name{font-size:10.5px}.gbar-w{color:var(--muted);font-size:9.5px}
+.gbar-track{position:relative;height:6px;background:var(--panel2);border-radius:4px}.gbar-mid{position:absolute;left:50%;top:-2px;width:1px;height:10px;background:var(--border)}.gbar-fill{position:absolute;top:0;height:6px;border-radius:4px}.gbar-val{font-family:var(--mono);font-size:10px;text-align:right}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:7px;overflow:hidden}
+.kpi{background:var(--panel);padding:10px 12px}.kpi-l{font-size:10.5px;color:var(--muted)}.kpi-v{font-size:16px;margin:2px 0}.kpi-c{font-size:10px;color:var(--accent)}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px}.metric.buy{border-left:3px solid var(--buy)}.metric.sell{border-left:3px solid var(--sell)}
+.m-l{font-size:10.5px;color:var(--muted)}.m-v{font-size:18px;margin-top:3px}
+canvas{width:100%;display:block;margin:6px 0 4px;cursor:crosshair}
+.readout{font-family:var(--mono);font-size:11px;color:var(--muted);min-height:16px;padding:2px 0}
+.legend2{display:flex;gap:14px;font-size:10.5px;color:var(--muted);margin-top:5px;flex-wrap:wrap}.legend2 i{display:inline-block;width:11px;height:3px;border-radius:2px;margin-right:4px;vertical-align:middle}
 .sev.extreme{color:var(--sell)}.sev.high{color:var(--amber)}.sev.medium{color:var(--text)}
-
-@media(max-width:960px){
-  .app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}
-  .nav{flex-direction:row;flex-wrap:wrap}.side-foot,.brand-sub{display:none}
-  .grid3{grid-template-columns:1fr}.mgrid{grid-template-columns:1fr 1fr}
-}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}.nav{flex-direction:row;flex-wrap:wrap}.side-foot,.brand-sub{display:none}.grid3{grid-template-columns:1fr}.mgrid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="side">
-    <div>
-      <div class="brand">HOSE Signal<span class="dot">.</span></div>
-      <div class="brand-sub">Phân tích kỹ thuật &amp; cơ bản · Tín hiệu Mua/Bán</div>
-    </div>
+    <div><div class="brand">HOSE Signal<span class="dot">.</span></div>
+    <div class="brand-sub">VN100 · Kỹ thuật + Cơ bản</div></div>
     <nav class="nav">
       <button data-tab="table"    class="on"><span class="ic"></span>Bảng tín hiệu</button>
       <button data-tab="detail"          ><span class="ic"></span>Phân tích mã</button>
@@ -142,7 +80,7 @@ canvas{width:100%;display:block;margin:8px 0 4px;cursor:crosshair}
     </nav>
     <div class="side-foot" id="data-foot">
       <span class="demo-badge" id="data-badge">● Dữ liệu minh hoạ</span>
-      <span id="data-foot-text">Số liệu mô phỏng để thử công cụ. Không phải khuyến nghị đầu tư.</span>
+      <span id="data-foot-text">Mô phỏng để thử. Không phải KNĐT.</span>
     </div>
   </aside>
   <main class="main">
@@ -152,498 +90,200 @@ canvas{width:100%;display:block;margin:8px 0 4px;cursor:crosshair}
     <section id="view-events"   class="view"></section>
   </main>
 </div>
+<script src="signals.js"></script>
 <script src="data.js"></script>
 <script>
-/* ===================================================================
-   engine.js v2 — Động cơ phân tích: kỹ thuật + cơ bản + điểm tổng hợp
-   =================================================================== */
-(function (root) {
+/* engine.js v3 — đọc signals.js (tính sẵn server-side) + data.js (OHLCV chi tiết) */
+(function(root){
 "use strict";
 
-/* ---------- PRNG / tiện ích ---------- */
-function mulberry32(seed) {
-  let a = seed >>> 0;
-  return function () {
-    a |= 0; a = (a + 0x6D2B79F5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function gauss(rng) {
-  let u = 0, v = 0;
-  while (!u) u = rng(); while (!v) v = rng();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-}
-function hashStr(s) {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-  return h >>> 0;
-}
-function businessDays(startISO, endISO) {
-  const out = [];
-  let d = new Date(startISO + "T00:00:00Z");
-  const end = new Date(endISO + "T00:00:00Z");
-  while (d <= end) {
-    const wd = d.getUTCDay();
-    if (wd !== 0 && wd !== 6) out.push(d.toISOString().slice(0, 10));
-    d = new Date(d.getTime() + 86400000);
-  }
-  return out;
-}
+/* ── Dữ liệu thật (ưu tiên) vs minh hoạ ─────────────────────────────── */
+const _SIG  = (typeof window!=="undefined" && window.HOSE_SIGNALS) ? window.HOSE_SIGNALS : null;
+const _DATA = (typeof window!=="undefined" && window.HOSE_DATA)    ? window.HOSE_DATA    : null;
+const IS_REAL = !!(_SIG && Object.keys(_SIG.signals||{}).length);
 
-/* ===================================================================
-   1) DỮ LIỆU THẬT (ưu tiên) / MINH HOẠ (fallback)
-   =================================================================== */
-const _REAL = (typeof window !== "undefined" && window.HOSE_DATA) ? window.HOSE_DATA : null;
-const IS_REAL = !!(_REAL && _REAL.stocks && Object.keys(_REAL.stocks).length);
+/* ── PRNG + minh hoạ (fallback offline) ─────────────────────────────── */
+function mulberry32(seed){
+  let a=seed>>>0;
+  return function(){a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
+}
+function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function bdays(a,b){const out=[];let d=new Date(a+"T00:00:00Z"),e=new Date(b+"T00:00:00Z");while(d<=e){const w=d.getUTCDay();if(w&&w<6)out.push(d.toISOString().slice(0,10));d=new Date(d.getTime()+86400000);}return out;}
 
-/* --- Dữ liệu minh hoạ (chỉ dùng khi không có file data.js) --- */
-const START_SYN = "2014-01-02", END_SYN = "2026-06-20";
-const INDEX_ANCHORS = [
-  ["2014-01-02",505],["2014-09-03",640],["2014-12-15",545],
-  ["2015-07-14",640],["2015-12-31",579],["2016-12-30",665],
-  ["2017-06-30",776],["2017-12-29",984],["2018-04-09",1204],
-  ["2018-12-28",893],["2019-12-31",961],["2020-03-24",660],
-  ["2020-12-31",1104],["2021-07-02",1310],["2021-11-25",1500],
+const SYN_UNI={
+  VCB:{name:"Vietcombank",sector:"Ngân hàng",beta:0.95,alpha:0.00018,sig:0.013,p0:18000},
+  VIC:{name:"Vingroup",sector:"Bất động sản",beta:1.15,alpha:0.00010,sig:0.020,p0:42000},
+  HPG:{name:"Hòa Phát",sector:"Thép",beta:1.25,alpha:0.00015,sig:0.021,p0:9000},
+  FPT:{name:"FPT",sector:"Công nghệ",beta:0.90,alpha:0.00035,sig:0.016,p0:7000},
+  VNM:{name:"Vinamilk",sector:"Tiêu dùng",beta:0.70,alpha:0.00004,sig:0.013,p0:90000},
+  MBB:{name:"MB Bank",sector:"Ngân hàng",beta:1.10,alpha:0.00020,sig:0.018,p0:15000},
+  SSI:{name:"SSI",sector:"Chứng khoán",beta:1.30,alpha:0.00012,sig:0.022,p0:12000},
+  GAS:{name:"PV Gas",sector:"Dầu khí",beta:0.85,alpha:0.00005,sig:0.017,p0:65000},
+  STB:{name:"Sacombank",sector:"Ngân hàng",beta:1.10,alpha:0.00014,sig:0.018,p0:17000},
+  MWG:{name:"Thế Giới Di Động",sector:"Bán lẻ",beta:1.05,alpha:0.00020,sig:0.019,p0:15000},
+};
+const ANCHORS=[["2018-01-02",970],["2018-04-09",1150],["2018-12-28",892],
+  ["2020-03-24",660],["2020-12-31",1105],["2021-11-25",1500],
   ["2022-01-06",1528],["2022-11-16",874],["2022-12-30",1007],
-  ["2023-06-30",1120],["2023-12-29",1130],["2024-06-28",1245],
-  ["2024-11-20",1205],["2024-12-31",1267],["2025-04-09",1073],
-  ["2025-08-07",1560],["2025-10-08",1790],["2025-12-25",1806],
-  ["2026-01-06",1816],["2026-06-20",1760],
-];
-const INDEX_SHOCKS = {
-  "2014-05-08":-0.052,"2014-12-08":-0.045,"2015-08-24":-0.058,
-  "2018-07-03":-0.045,"2020-03-09":-0.060,"2020-03-23":-0.062,
-  "2022-03-29":-0.040,"2022-10-10":-0.050,"2022-11-15":-0.045,
-  "2025-04-03":-0.067,"2025-04-08":-0.058,"2025-05-05":0.028,
-  "2025-08-07":0.042,"2025-10-08":0.030,
-};
+  ["2023-12-29",1130],["2024-12-31",1267],["2025-04-09",1073],
+  ["2025-12-25",1806],["2026-06-19",1760]];
+const SHOCKS={"2020-03-09":-0.06,"2020-03-23":-0.062,"2022-03-29":-0.040,
+  "2022-10-10":-0.050,"2025-04-03":-0.067,"2025-08-07":0.042,"2025-10-08":0.030};
 
-function buildIndex() {
-  const dates = businessDays(START_SYN, END_SYN);
-  const idxByDate = {};
-  dates.forEach((d, i) => (idxByDate[d] = i));
-  const anchorPts = INDEX_ANCHORS.map(([d, v]) => {
-    let pos = idxByDate[d];
-    if (pos == null) {
-      let best = 0, bestGap = 1e9, t = new Date(d).getTime();
-      dates.forEach((dd, j) => { const g = Math.abs(new Date(dd).getTime()-t); if(g<bestGap){bestGap=g;best=j;} });
-      pos = best;
-    }
-    return [pos, v];
-  });
-  const level = new Array(dates.length).fill(0);
-  for (let k = 0; k < anchorPts.length - 1; k++) {
-    const [p0,v0]= anchorPts[k], [p1,v1]= anchorPts[k+1];
-    const lv0=Math.log(v0), lv1=Math.log(v1);
-    for (let i=p0;i<=p1;i++) {
-      const f = p1===p0 ? 0 : (i-p0)/(p1-p0);
-      level[i] = Math.exp(lv0+f*(lv1-lv0));
-    }
+function buildSynIndex(){
+  const dates=bdays("2018-01-02","2026-06-19");
+  const dmap={}; dates.forEach((d,i)=>dmap[d]=i);
+  const n=dates.length, level=new Array(n).fill(0);
+  for(let k=0;k<ANCHORS.length-1;k++){
+    const[d0,v0]=ANCHORS[k],[d1,v1]=ANCHORS[k+1];
+    const p0=dmap[d0]??0, p1=dmap[d1]??p0+1;
+    const lv0=Math.log(v0),lv1=Math.log(v1);
+    for(let i=p0;i<=p1;i++){const f=p1>p0?(i-p0)/(p1-p0):0;level[i]=Math.exp(lv0+f*(lv1-lv0));}
   }
-  const rng = mulberry32(20140102); const close = new Array(dates.length);
-  let eps = 0;
-  for (let i = 0; i < dates.length; i++) {
-    eps = 0.92*eps + 0.006*gauss(rng);
-    if (INDEX_SHOCKS[dates[i]] != null) eps += INDEX_SHOCKS[dates[i]];
-    close[i] = level[i] * Math.exp(eps);
-  }
-  return { dates, close };
+  const rng=mulberry32(20180102); const close=new Array(n); let eps=0;
+  for(let i=0;i<n;i++){eps=0.92*eps+0.006*gauss(rng);if(SHOCKS[dates[i]])eps+=SHOCKS[dates[i]];close[i]=level[i]*Math.exp(eps);}
+  return{dates,close};
 }
-const _SYN_INDEX = buildIndex();
+const _IDX=buildSynIndex();
 
-const SYN_UNIVERSE = {
-  VCB:{name:"Vietcombank",beta:0.95,alpha:0.00018,sig:0.013,p0:18000,sector:"Ngân hàng"},
-  VIC:{name:"Vingroup",beta:1.15,alpha:0.00010,sig:0.020,p0:42000,sector:"Bất động sản"},
-  VHM:{name:"Vinhomes",beta:1.10,alpha:0.00012,sig:0.019,p0:70000,sector:"Bất động sản"},
-  HPG:{name:"Hòa Phát",beta:1.25,alpha:0.00015,sig:0.021,p0:9000,sector:"Thép"},
-  FPT:{name:"FPT",beta:0.90,alpha:0.00035,sig:0.016,p0:7000,sector:"Công nghệ"},
-  SSI:{name:"SSI",beta:1.30,alpha:0.00012,sig:0.022,p0:12000,sector:"Chứng khoán"},
-  MWG:{name:"Thế Giới Di Động",beta:1.05,alpha:0.00020,sig:0.019,p0:15000,sector:"Bán lẻ"},
-  GAS:{name:"PV Gas",beta:0.85,alpha:0.00005,sig:0.017,p0:65000,sector:"Dầu khí"},
-  STB:{name:"Sacombank",beta:1.10,alpha:0.00014,sig:0.018,p0:17000,sector:"Ngân hàng"},
-  VNM:{name:"Vinamilk",beta:0.70,alpha:0.00004,sig:0.013,p0:90000,sector:"Tiêu dùng"},
-};
-const SYN_OVERLAYS = {
-  VIC:[["2025-05-13","2025-12-25",0.0016]],
-  VHM:[["2025-05-13","2025-12-25",0.0015]],
-  GAS:[["2014-12-01","2015-01-31",-0.0020]],
-  HPG:[["2021-01-01","2021-11-25",0.0012]],
-};
-function inRange(d,a,b){return d>=a&&d<=b;}
-
-function buildSynStock(sym) {
-  const cfg = SYN_UNIVERSE[sym];
-  const {dates,close:idx} = _SYN_INDEX;
-  const rng = mulberry32(hashStr(sym)^0x9e3779b9);
-  const n = dates.length;
+function buildSynStock(sym){
+  const cfg=SYN_UNI[sym]; if(!cfg) return null;
+  const{dates,close:idx}=_IDX; const n=dates.length;
+  const rng=mulberry32(hashStr(sym)^0x9e3779b9), vrng=mulberry32(hashStr(sym+"v"));
   const close=new Array(n),open=new Array(n),high=new Array(n),low=new Array(n),vol=new Array(n);
-  let alphaCum=0, idio=0;
-  for (let i=0;i<n;i++) {
-    let alpha=cfg.alpha;
-    const ov=SYN_OVERLAYS[sym];
-    if(ov) for(const[a,b,add] of ov) if(inRange(dates[i],a,b)) alpha+=add;
-    if(i>0) alphaCum+=alpha;
-    idio=0.95*idio+cfg.sig*gauss(rng);
-    close[i]=Math.max(500, cfg.p0*Math.pow(idx[i]/idx[0],cfg.beta)*Math.exp(alphaCum+idio));
+  let aC=0,id=0;
+  for(let i=0;i<n;i++){
+    if(i>0)aC+=cfg.alpha; id=0.95*id+cfg.sig*gauss(rng);
+    close[i]=Math.max(500,cfg.p0*Math.pow(idx[i]/idx[0],cfg.beta)*Math.exp(aC+id));
   }
-  const vrng=mulberry32(hashStr(sym+"vol"));
   for(let i=0;i<n;i++){
     open[i]=i===0?close[i]:close[i-1];
-    const ret=i===0?0:Math.abs(Math.log(close[i]/close[i-1]));
-    const rng2=(0.004+ret)*close[i];
-    high[i]=Math.max(open[i],close[i])+Math.abs(gauss(vrng))*rng2*0.5;
-    low[i]=Math.min(open[i],close[i])-Math.abs(gauss(vrng))*rng2*0.5;
-    vol[i]=Math.round((800000+Math.abs(gauss(vrng))*2500000)*(1+(ret>0.03?1.5:0)));
+    const r=i===0?0:Math.abs(Math.log(close[i]/close[i-1]));
+    const d=(0.004+r)*close[i];
+    high[i]=Math.max(open[i],close[i])+Math.abs(gauss(vrng))*d*0.5;
+    low[i]=Math.min(open[i],close[i])-Math.abs(gauss(vrng))*d*0.5;
+    vol[i]=Math.round((800000+Math.abs(gauss(vrng))*2500000)*(r>0.03?2.5:1));
   }
-  return {dates,open,high,low,close,volume:vol};
+  return{dates,open,high,low,close,volume:vol};
 }
 
-/* ===================================================================
-   2) CHỈ BÁO KỸ THUẬT
-   =================================================================== */
-const I = {};
-I.sma=(s,p)=>s.map((_,i)=>i<p-1?null:avg(s.slice(i-p+1,i+1)));
-I.ema=(s,p)=>{const k=2/(p+1);const o=[];let prev=s[0];for(let i=0;i<s.length;i++){prev=i===0?s[0]:s[i]*k+prev*(1-k);o.push(prev);}return o;};
-function avg(a){let t=0,c=0;for(const x of a)if(x!=null){t+=x;c++;}return c?t/c:null;}
-function std(a){const m=avg(a);if(m==null)return null;let t=0,c=0;for(const x of a)if(x!=null){t+=(x-m)**2;c++;}return c?Math.sqrt(t/c):null;}
-function wilder(s,p){const o=new Array(s.length).fill(null);let prev=null,init=0,cnt=0;for(let i=0;i<s.length;i++){if(s[i]==null){o[i]=null;continue;}if(prev==null){init+=s[i];cnt++;if(cnt===p){prev=init/p;o[i]=prev;}}else{prev=(prev*(p-1)+s[i])/p;o[i]=prev;}}return o;}
+/* ── Chỉ báo (dùng khi cần phân tích chi tiết offline) ─────────────── */
+const I={};
+I.sma=(s,p)=>s.map((_,i)=>i<p-1?null:s.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);
+I.ema=(s,p)=>{const k=2/(p+1);const o=[];let pr=s[0];for(let i=0;i<s.length;i++){pr=i===0?s[0]:s[i]*k+pr*(1-k);o.push(pr);}return o;};
+function wilder(s,p){const o=new Array(s.length).fill(null);let pr=null,buf=[],cnt=0;for(let i=0;i<s.length;i++){if(s[i]==null)continue;if(pr==null){buf.push(s[i]);if(buf.length===p){pr=buf.reduce((a,b)=>a+b,0)/p;o[i]=pr;}}else{pr=(pr*(p-1)+s[i])/p;o[i]=pr;}}return o;}
+I.rsi=function(c,p=14){const g=[null],l=[null];for(let i=1;i<c.length;i++){const d=c[i]-c[i-1];g.push(Math.max(d,0));l.push(Math.max(-d,0));}const ag=wilder(g.slice(1),p),al=wilder(l.slice(1),p);const out=[null];for(let i=0;i<ag.length;i++){if(ag[i]==null||al[i]==null){out.push(null);continue;}const rs=al[i]===0?100:ag[i]/al[i];out.push(100-100/(1+rs));}return out;};
+I.macd=function(c,f=12,s=26,sg=9){const ef=I.ema(c,f),es=I.ema(c,s),m=ef.map((v,i)=>v-es[i]),si=I.ema(m,sg);return{macd:m,signal:si,hist:m.map((v,i)=>v-si[i])};};
+I.bollinger=function(c,p=20,k=2){const mid=I.sma(c,p);const up=[],lo=[],pb=[];for(let i=0;i<c.length;i++){if(i<p-1){up.push(null);lo.push(null);pb.push(null);continue;}let sum2=0,cnt=0;for(let j=i-p+1;j<=i;j++)if(c[j]!=null){sum2+=(c[j]-mid[i])**2;cnt++;}const sd=Math.sqrt(sum2/cnt);up.push(mid[i]+k*sd);lo.push(mid[i]-k*sd);pb.push((up[i]-lo[i])>0?(c[i]-lo[i])/(up[i]-lo[i]):null);}return{mid,up,lo,pctb:pb};};
+I.adx=function(h,l,c,p=14){const pdm=[null],mdm=[null],tr=[null];for(let i=1;i<c.length;i++){const u=h[i]-h[i-1],d=l[i-1]-l[i];pdm.push(u>d&&u>0?u:0);mdm.push(d>u&&d>0?d:0);tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));}const at=wilder(tr.slice(1),p),sp=wilder(pdm.slice(1),p),sm=wilder(mdm.slice(1),p);const dxA=[],pdiA=[],mdiA=[];for(let i=0;i<at.length;i++){if(at[i]==null||at[i]===0){pdiA.push(null);mdiA.push(null);dxA.push(null);continue;}const pi=100*sp[i]/at[i],mi=100*sm[i]/at[i];pdiA.push(pi);mdiA.push(mi);dxA.push((pi+mi)>0?100*Math.abs(pi-mi)/(pi+mi):null);}return{adx:[null,...wilder(dxA,p)],pdi:[null,...pdiA],mdi:[null,...mdiA]};};
+I.obv=function(c,v){const o=[0];for(let i=1;i<c.length;i++)o.push(o[i-1]+Math.sign(c[i]-c[i-1])*v[i]);return o;};
 
-I.rsi=function(close,p=14){
-  const gain=[null],loss=[null];
-  for(let i=1;i<close.length;i++){const d=close[i]-close[i-1];gain.push(Math.max(d,0));loss.push(Math.max(-d,0));}
-  const ag=wilder(gain.slice(1),p),al=wilder(loss.slice(1),p);
-  const out=[null];
-  for(let i=0;i<ag.length;i++){if(ag[i]==null||al[i]==null){out.push(null);continue;}const rs=al[i]===0?100:ag[i]/al[i];out.push(100-100/(1+rs));}
-  return out;
-};
-I.macd=function(close,f=12,s=26,sig=9){
-  const ef=I.ema(close,f),es=I.ema(close,s);
-  const macd=ef.map((v,i)=>v-es[i]);
-  const signal=I.ema(macd,sig);
-  const hist=macd.map((v,i)=>v-signal[i]);
-  return{macd,signal,hist};
-};
-I.bollinger=function(close,p=20,k=2){
-  const mid=I.sma(close,p);
-  const up=[],lo=[],pctb=[];
-  for(let i=0;i<close.length;i++){
-    if(i<p-1){up.push(null);lo.push(null);pctb.push(null);continue;}
-    const sd=std(close.slice(i-p+1,i+1));
-    const u=mid[i]+k*sd,l=mid[i]-k*sd;
-    up.push(u);lo.push(l);pctb.push((u-l)===0?null:(close[i]-l)/(u-l));
-  }
-  return{mid,up,lo,pctb};
-};
-I.stoch=function(high,low,close,kP=14,dP=3){
-  const k=[];
-  for(let i=0;i<close.length;i++){
-    if(i<kP-1){k.push(null);continue;}
-    const hh=Math.max(...high.slice(i-kP+1,i+1));
-    const ll=Math.min(...low.slice(i-kP+1,i+1));
-    k.push((hh-ll)===0?null:100*(close[i]-ll)/(hh-ll));
-  }
-  const d=I.sma(k.map(x=>x==null?null:x),dP);
-  return{k,d};
-};
-I.atr=function(high,low,close,p=14){
-  const tr=[null];
-  for(let i=1;i<close.length;i++) tr.push(Math.max(high[i]-low[i],Math.abs(high[i]-close[i-1]),Math.abs(low[i]-close[i-1])));
-  return wilder(tr.slice(1),p);
-};
-I.adx=function(high,low,close,p=14){
-  const plusDM=[null],minusDM=[null],tr=[null];
-  for(let i=1;i<close.length;i++){
-    const up=high[i]-high[i-1],dn=low[i-1]-low[i];
-    plusDM.push(up>dn&&up>0?up:0);
-    minusDM.push(dn>up&&dn>0?dn:0);
-    tr.push(Math.max(high[i]-low[i],Math.abs(high[i]-close[i-1]),Math.abs(low[i]-close[i-1])));
-  }
-  const atr=wilder(tr.slice(1),p),sp=wilder(plusDM.slice(1),p),sm=wilder(minusDM.slice(1),p);
-  const dxArr=[];const pdi=[],mdi=[];
-  for(let i=0;i<atr.length;i++){
-    if(atr[i]==null||atr[i]===0){pdi.push(null);mdi.push(null);dxArr.push(null);continue;}
-    const p_=100*sp[i]/atr[i],m_=100*sm[i]/atr[i];
-    pdi.push(p_);mdi.push(m_);
-    dxArr.push((p_+m_)===0?null:100*Math.abs(p_-m_)/(p_+m_));
-  }
-  return{adx:[null,...wilder(dxArr,p)],pdi:[null,...pdi],mdi:[null,...mdi]};
-};
-I.obv=function(close,vol){const o=[0];for(let i=1;i<close.length;i++){const s=Math.sign(close[i]-close[i-1]);o.push(o[i-1]+s*vol[i]);}return o;};
-
-function enrich(d) {
+function enrich(d){
   const{open,high,low,close,volume}=d;
-  const macd=I.macd(close),bb=I.bollinger(close),st=I.stoch(high,low,close),adx=I.adx(high,low,close);
-  return{
-    ...d,
-    sma20:I.sma(close,20),sma50:I.sma(close,50),sma200:I.sma(close,200),
-    rsi:I.rsi(close,14),
-    macd:macd.macd,macdSignal:macd.signal,macdHist:macd.hist,
+  const mc=I.macd(close),bb=I.bollinger(close),adx=I.adx(high,low,close);
+  return{...d,sma20:I.sma(close,20),sma50:I.sma(close,50),
+    rsi:I.rsi(close,14),macd:mc.macd,macdSignal:mc.signal,macdHist:mc.hist,
     bbUp:bb.up,bbMid:bb.mid,bbLo:bb.lo,bbPctb:bb.pctb,
-    stochK:st.k,stochD:st.d,
     adx:adx.adx,plusDI:adx.pdi,minusDI:adx.mdi,
-    atr:I.atr(high,low,close,14),
-    obv:I.obv(close,volume),
-    volMA20:I.sma(volume,20),
+    atr:I.sma(close.map((_,i)=>i===0?0:Math.max(high[i]-low[i],Math.abs(high[i]-close[i-1]),Math.abs(low[i]-close[i-1]))),14),
+    obv:I.obv(close,volume),volMA20:I.sma(volume,20),
+    stochK:close.map((_,i)=>{if(i<13)return null;const hh=Math.max(...high.slice(i-13,i+1)),ll=Math.min(...low.slice(i-13,i+1));return(hh-ll)>0?100*(close[i]-ll)/(hh-ll):null;}),
   };
 }
 
-/* ===================================================================
-   3) ĐIỂM KỸ THUẬT
-   =================================================================== */
-const WEIGHTS={trend:0.30,momentum:0.25,volatility:0.20,volume:0.15,strength:0.10};
-const BUY_TH=0.25, SELL_TH=-0.25;
-const clip=(x,a,b)=>Math.max(a,Math.min(b,x));
-
-function scoreAt(e,i) {
-  if(i<50) return null;
-  const c=e.close[i],cp=e.close[i-1];
-  let trend=0;
-  trend+=c>e.sma50[i]?0.5:-0.5;
-  trend+=e.sma20[i]>e.sma50[i]?0.5:-0.5;
-  if(e.sma20[i]>e.sma50[i]&&e.sma20[i-1]<=e.sma50[i-1]) trend+=1;
-  if(e.sma20[i]<e.sma50[i]&&e.sma20[i-1]>=e.sma50[i-1]) trend-=1;
-  if(e.macd[i]>e.macdSignal[i]&&e.macd[i-1]<=e.macdSignal[i-1]) trend+=1;
-  if(e.macd[i]<e.macdSignal[i]&&e.macd[i-1]>=e.macdSignal[i-1]) trend-=1;
-  trend+=e.macdHist[i]>0?0.25:-0.25;
-  const sTrend=clip(trend/3.25,-1,1);
-
-  let mom=0;const rsi=e.rsi[i];
-  if(rsi!=null){if(rsi<30)mom+=1;if(rsi>70)mom-=1;if(rsi>=50&&rsi<=70)mom+=0.3;if(rsi>=30&&rsi<50)mom-=0.3;}
-  if(e.stochK[i]!=null&&e.stochD[i]!=null){
-    if(e.stochK[i]>e.stochD[i]&&e.stochK[i-1]<=e.stochD[i-1]&&e.stochK[i]<30) mom+=0.7;
-    if(e.stochK[i]<e.stochD[i]&&e.stochK[i-1]>=e.stochD[i-1]&&e.stochK[i]>70) mom-=0.7;
-  }
-  const sMom=clip(mom/2,-1,1);
-
-  let vol=0;const pb=e.bbPctb[i];
-  if(pb!=null){if(pb<0.05)vol+=1;if(pb>0.95)vol-=1;if(pb>=0.05&&pb<0.5)vol+=0.2;if(pb>0.5&&pb<=0.95)vol-=0.2;}
-  const sVol=clip(vol,-1,1);
-
-  let vu=0;const spike=e.volume[i]>1.5*(e.volMA20[i]||Infinity);const up=c>cp;
-  if(spike&&up)vu+=0.6;if(spike&&!up)vu-=0.6;
-  if(i>=5)vu+=(e.obv[i]-e.obv[i-5])>0?0.4:-0.4;
-  const sVolu=clip(vu,-1,1);
-
-  let str=0;const strong=e.adx[i]!=null&&e.adx[i]>25;
-  if(strong&&e.plusDI[i]>e.minusDI[i])str+=0.8;
-  if(strong&&e.minusDI[i]>e.plusDI[i])str-=0.8;
-  const sStr=clip(str,-1,1);
-
-  const total=WEIGHTS.trend*sTrend+WEIGHTS.momentum*sMom+WEIGHTS.volatility*sVol+WEIGHTS.volume*sVolu+WEIGHTS.strength*sStr;
-  const signal=total>=BUY_TH?"BUY":total<=SELL_TH?"SELL":"HOLD";
-  return{sTrend,sMom,sVol,sVolu,sStr,total,signal};
+/* ── Điểm cơ bản ────────────────────────────────────────────────────── */
+function scoreFundamental(fund){
+  if(!fund||!Object.keys(fund).length)return null;
+  let s=0;
+  if(fund.pe&&fund.pe>0){const v=fund.pe<10?1:fund.pe<15?0.5:fund.pe<25?0:fund.pe<35?-0.5:-1;s+=v*0.25;}
+  if(fund.pb&&fund.pb>0){const v=fund.pb<1?1:fund.pb<2?0.5:fund.pb<3.5?0:-0.5;s+=v*0.15;}
+  if(fund.roe!=null){const r=fund.roe>1?fund.roe/100:fund.roe;s+=(r>0.20?1:r>0.15?0.7:r>0.10?0.3:r>0.05?0:-0.5)*0.30;}
+  if(fund.roa!=null){const r=fund.roa>1?fund.roa/100:fund.roa;s+=(r>0.10?1:r>0.06?0.5:r>0.03?0:-0.5)*0.15;}
+  if(fund.eps_growth!=null){const g=fund.eps_growth>1?fund.eps_growth/100:fund.eps_growth;s+=(g>0.20?1:g>0.10?0.5:g>0?0.1:g>-0.10?-0.3:-1)*0.15;}
+  return Math.max(-1,Math.min(1,s));
+}
+function fundGrade(score){
+  if(score==null)return{grade:"N/A",color:"#8B94A3",desc:"Chưa có dữ liệu"};
+  if(score>=0.6)return{grade:"A",color:"#2DBE8B",desc:"Tài chính rất tốt"};
+  if(score>=0.3)return{grade:"B",color:"#4FD1C5",desc:"Tài chính ổn định"};
+  if(score>=0)return{grade:"C",color:"#E0A23C",desc:"Trung bình"};
+  if(score>=-0.3)return{grade:"D",color:"#E5484D",desc:"Dưới trung bình"};
+  return{grade:"F",color:"#E5484D",desc:"Tài chính yếu"};
 }
 
-function scoreSeries(e){
-  const out={total:[],signal:[]};
-  for(let i=0;i<e.close.length;i++){const s=scoreAt(e,i);out.total.push(s?s.total:null);out.signal.push(s?s.signal:"HOLD");}
-  return out;
-}
-
-function reasonsAt(e,i){
-  const tags=[];
-  if(i>0){
-    if(e.sma20[i]>e.sma50[i]&&e.sma20[i-1]<=e.sma50[i-1]) tags.push("Golden cross 20/50");
-    if(e.sma20[i]<e.sma50[i]&&e.sma20[i-1]>=e.sma50[i-1]) tags.push("Death cross 20/50");
-    if(e.macd[i]>e.macdSignal[i]&&e.macd[i-1]<=e.macdSignal[i-1]) tags.push("MACD cắt lên");
-    if(e.macd[i]<e.macdSignal[i]&&e.macd[i-1]>=e.macdSignal[i-1]) tags.push("MACD cắt xuống");
-  }
-  if(e.rsi[i]!=null){if(e.rsi[i]<30)tags.push("RSI quá bán ("+e.rsi[i].toFixed(0)+")");else if(e.rsi[i]>70)tags.push("RSI quá mua ("+e.rsi[i].toFixed(0)+")");}
-  if(e.bbPctb[i]!=null){if(e.bbPctb[i]<0.05)tags.push("Chạm dải Bollinger dưới");else if(e.bbPctb[i]>0.95)tags.push("Chạm dải Bollinger trên");}
-  if(e.adx[i]!=null&&e.adx[i]>25)tags.push("Xu hướng mạnh (ADX "+e.adx[i].toFixed(0)+")");
-  return tags;
-}
-
-/* ===================================================================
-   4) ĐIỂM CƠ BẢN (fundamental score)
-   =================================================================== */
-// Chuẩn điểm từng chỉ số: trả về [-1, 1]
-function scoreFundamental(fund) {
-  if (!fund || Object.keys(fund).length === 0) return null;
-  let score = 0, count = 0;
-
-  // P/E: thấp = tốt hơn (ngưỡng tham chiếu ngành VN ~15)
-  if (fund.pe != null && fund.pe > 0) {
-    const s = fund.pe < 10 ? 1 : fund.pe < 15 ? 0.5 : fund.pe < 25 ? 0 : fund.pe < 35 ? -0.5 : -1;
-    score += s * 0.25; count++;
-  }
-  // P/B: thấp = tốt hơn (ngưỡng ~2)
-  if (fund.pb != null && fund.pb > 0) {
-    const s = fund.pb < 1 ? 1 : fund.pb < 2 ? 0.5 : fund.pb < 3.5 ? 0 : -0.5;
-    score += s * 0.15; count++;
-  }
-  // ROE: cao = tốt (ngưỡng ~15%)
-  if (fund.roe != null) {
-    const roe = fund.roe > 1 ? fund.roe / 100 : fund.roe; // chuẩn hoá về dạng thập phân
-    const s = roe > 0.20 ? 1 : roe > 0.15 ? 0.7 : roe > 0.10 ? 0.3 : roe > 0.05 ? 0 : -0.5;
-    score += s * 0.30; count++;
-  }
-  // ROA
-  if (fund.roa != null) {
-    const roa = fund.roa > 1 ? fund.roa / 100 : fund.roa;
-    const s = roa > 0.10 ? 1 : roa > 0.06 ? 0.5 : roa > 0.03 ? 0 : -0.5;
-    score += s * 0.15; count++;
-  }
-  // Tăng trưởng EPS
-  if (fund.eps_growth != null) {
-    const g = fund.eps_growth > 1 ? fund.eps_growth / 100 : fund.eps_growth;
-    const s = g > 0.20 ? 1 : g > 0.10 ? 0.5 : g > 0 ? 0.1 : g > -0.10 ? -0.3 : -1;
-    score += s * 0.15; count++;
-  }
-
-  if (count === 0) return null;
-  return Math.max(-1, Math.min(1, score));
-}
-
-// Xếp hạng sức khỏe tài chính bằng lời
-function fundGrade(score) {
-  if (score == null) return { grade: "N/A", color: "#8B94A3", desc: "Chưa có dữ liệu" };
-  if (score >= 0.6)  return { grade: "A",   color: "#2DBE8B", desc: "Tài chính rất tốt" };
-  if (score >= 0.3)  return { grade: "B",   color: "#4FD1C5", desc: "Tài chính ổn định" };
-  if (score >= 0)    return { grade: "C",   color: "#E0A23C", desc: "Trung bình" };
-  if (score >= -0.3) return { grade: "D",   color: "#E5484D", desc: "Dưới trung bình" };
-  return                    { grade: "F",   color: "#E5484D", desc: "Tài chính yếu" };
-}
-
-/* ===================================================================
-   5) ĐIỂM TỔNG HỢP (kỹ thuật + cơ bản)
-   =================================================================== */
-function compositeScore(techScore, fundScore) {
-  if (fundScore == null) return { score: techScore, signal: techToSignal(techScore), hasFund: false };
-  // Kỹ thuật 60%, cơ bản 40%
-  const combined = techScore * 0.6 + fundScore * 0.4;
-  // Bộ lọc: tín hiệu MUA chỉ được phát khi cơ bản ít nhất trung bình (>= 0)
-  // Tín hiệu BÁN không bị chặn (cần thoát bất kể cơ bản)
-  let signal = techToSignal(combined);
-  if (signal === "BUY" && fundScore < -0.2) signal = "HOLD"; // chặn mua khi cơ bản yếu
-  return { score: combined, techScore, fundScore, signal, hasFund: true };
-}
-function techToSignal(s) { return s >= 0.25 ? "BUY" : s <= -0.25 ? "SELL" : "HOLD"; }
-
-/* ===================================================================
-   6) BACKTEST
-   =================================================================== */
-function backtest(e, sigArr, cap=100000000, fee=0.0015, tax=0.001) {
-  let cash=cap, shares=0, openPrice=0;
-  const equity=[], trades=[];
-  for(let i=0;i<e.close.length;i++){
-    const price=e.close[i], action=i===0?"HOLD":sigArr[i-1];
-    if(action==="BUY"&&shares===0&&price>0){
-      const f=cash*fee; shares=(cash-f)/price; openPrice=price; cash=0;
-      trades.push({date:e.dates[i],side:"BUY",price});
-    } else if(action==="SELL"&&shares>0){
-      const proceeds=shares*price; const f=proceeds*(fee+tax); cash=proceeds-f;
-      trades.push({date:e.dates[i],side:"SELL",price,ret:(price-openPrice)/openPrice}); shares=0;
-    }
-    equity.push(cash+shares*price);
-  }
-  const final=equity[equity.length-1], totalRet=final/cap-1;
-  const years=equity.length/250, cagr=final>0?Math.pow(final/cap,1/years)-1:null;
-  const dret=[]; for(let i=1;i<equity.length;i++) dret.push(equity[i]/equity[i-1]-1);
-  function avg2(a){return a.length?a.reduce((s,v)=>s+v,0)/a.length:0;}
-  function std2(a){const m=avg2(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/Math.max(a.length-1,1));}
-  const m=avg2(dret), sd=std2(dret), sharpe=sd>0?(m/sd)*Math.sqrt(250):null;
-  let peak=-Infinity, maxDD=0; for(const v of equity){if(v>peak)peak=v;const dd=v/peak-1;if(dd<maxDD)maxDD=dd;}
-  const closed=trades.filter(t=>t.side==="SELL");
-  const wins=closed.filter(t=>t.ret>0);
-  const winRate=closed.length?wins.length/closed.length:null;
-  const gp=wins.reduce((a,t)=>a+t.ret,0), gl=Math.abs(closed.filter(t=>t.ret<=0).reduce((a,t)=>a+t.ret,0));
-  const pf=gl>0?gp/gl:null;
-  return{equity,trades,buyHold:e.close[e.close.length-1]/e.close[0]-1,
-    metrics:{totalRet,cagr,sharpe,maxDD,numTrades:closed.length,winRate,profitFactor:pf,final}};
-}
-
-/* ===================================================================
-   7) SỰ KIỆN
-   =================================================================== */
-const INDEX_EV = "INDEX";
-const EVENTS = [
-  {date:"2014-05-08",title:"Khủng hoảng giàn khoan HD-981",cat:"Địa chính trị",scope:INDEX_EV,dir:"down",sev:"high",note:"Căng thẳng Biển Đông; VN-Index lao dốc tháng 5/2014."},
-  {date:"2014-12-08",title:"Giá dầu thế giới sụp đổ",cat:"Ngành",scope:["GAS"],dir:"down",sev:"high",note:"Brent 110→60 USD; nhóm dầu khí giảm sâu."},
-  {date:"2015-08-24",title:"TQ phá giá CNY + Black Monday",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"down",sev:"high",note:"Hoảng loạn toàn cầu; áp lực tỷ giá VND."},
-  {date:"2017-12-18",title:"Đấu giá Sabeco (ThaiBev)",cat:"Doanh nghiệp",scope:[],dir:"up",sev:"medium",note:"Mua 53,59% SAB (~4,8 tỷ USD)."},
-  {date:"2018-04-09",title:"Đỉnh ~1.204 & chiến tranh thương mại Mỹ-Trung",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"down",sev:"high",note:"Fed tăng lãi suất dồn dập."},
-  {date:"2018-05-17",title:"Vinhomes (VHM) niêm yết",cat:"Doanh nghiệp",scope:["VHM","VIC"],dir:"up",sev:"medium",note:"IPO lớn nhất lịch sử thời điểm đó."},
-  {date:"2020-03-23",title:"COVID-19 — đáy ~659",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"down",sev:"extreme",note:"Đại dịch; đáy 24/3/2020."},
-  {date:"2020-08-01",title:"Sóng hồi phục 'F0' tiền rẻ",cat:"Tiền tệ",scope:INDEX_EV,dir:"up",sev:"high",note:"Lãi suất thấp kỷ lục; NĐT cá nhân ồ ạt."},
-  {date:"2021-11-25",title:"VN-Index lần đầu chạm ~1.500",cat:"Tiền tệ",scope:INDEX_EV,dir:"up",sev:"high",note:"Đỉnh tiền rẻ."},
-  {date:"2022-01-06",title:"Đỉnh lịch sử ~1.528",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"down",sev:"high",note:"Trước chu kỳ siết chặt."},
-  {date:"2022-02-24",title:"Nga tấn công Ukraine",cat:"Địa chính trị",scope:INDEX_EV,dir:"down",sev:"medium",note:"Sốc giá hàng hóa & lạm phát toàn cầu."},
-  {date:"2022-03-29",title:"Bắt ông Trịnh Văn Quyết (FLC)",cat:"Pháp lý",scope:INDEX_EV,dir:"down",sev:"extreme",note:"Nhóm FLC nằm sàn nhiều phiên; khởi đầu khủng hoảng TPDN."},
-  {date:"2022-10-10",title:"Vạn Thịnh Phát — rút tiền SCB",cat:"Trái phiếu",scope:INDEX_EV,dir:"down",sev:"extreme",note:"Đóng băng thị trường TPDN; margin call lan rộng."},
-  {date:"2022-11-15",title:"VN-Index tạo đáy ~874",cat:"Trái phiếu",scope:["VIC","VHM"],dir:"down",sev:"extreme",note:"Bất động sản nằm sàn hàng loạt."},
-  {date:"2023-03-05",title:"Nghị định 08 gỡ khó trái phiếu",cat:"Pháp lý",scope:INDEX_EV,dir:"up",sev:"medium",note:"Cho gia hạn/hoán đổi TPDN; giảm áp lực đáo hạn."},
-  {date:"2023-06-30",title:"NHNN hạ lãi suất 4 lần",cat:"Tiền tệ",scope:INDEX_EV,dir:"up",sev:"high",note:"Nới lỏng; dòng tiền quay lại cổ phiếu."},
-  {date:"2024-11-20",title:"Đáy tháng 11/2024 & bầu cử Mỹ",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"down",sev:"medium",note:"Áp lực tỷ giá sau bầu cử Mỹ."},
-  {date:"2025-04-02",title:"Mỹ áp thuế đối ứng 46% với VN",cat:"Địa chính trị",scope:INDEX_EV,dir:"down",sev:"extreme",note:"'Liberation Day'; châm ngòi bán tháo mạnh."},
-  {date:"2025-04-03",title:"VN-Index giảm 88 điểm — mạnh nhất lịch sử",cat:"Địa chính trị",scope:INDEX_EV,dir:"down",sev:"extreme",note:"Hai phiên 3–4/4 mất ~107 điểm."},
-  {date:"2025-05-05",title:"Hệ thống KRX vận hành chính thức",cat:"Cấu trúc TT",scope:INDEX_EV,dir:"up",sev:"high",note:"Nền tảng thanh khoản kỷ lục & sản phẩm mới."},
-  {date:"2025-08-07",title:"Thuế Mỹ giảm về 20% sau đàm phán",cat:"Địa chính trị",scope:INDEX_EV,dir:"up",sev:"high",note:"Gỡ rủi ro thuế quan; vượt đỉnh 2022."},
-  {date:"2025-10-08",title:"FTSE nâng hạng VN lên Mới nổi",cat:"Cấu trúc TT",scope:INDEX_EV,dir:"up",sev:"extreme",note:"Hiệu lực 21/9/2026; kỳ vọng hút vốn ngoại lớn."},
-  {date:"2025-12-25",title:"Đỉnh lịch sử ~1.806",cat:"Vĩ mô toàn cầu",scope:["VIC","VHM"],dir:"up",sev:"high",note:"Cả năm +40,87%; VIC+VHM dẫn dắt."},
-  {date:"2026-01-06",title:"VN-Index vượt mốc 1.800",cat:"Vĩ mô toàn cầu",scope:INDEX_EV,dir:"up",sev:"medium",note:"Nhóm ngân hàng phục hồi."},
+/* ── Sự kiện ────────────────────────────────────────────────────────── */
+const EVENTS=[
+  {date:"2020-03-23",title:"COVID-19 — đáy ~660",dir:"down",sev:"extreme",note:"Đại dịch; đáy 24/3/2020."},
+  {date:"2020-08-01",title:"Sóng hồi phục F0 tiền rẻ",dir:"up",sev:"high",note:"Lãi suất thấp kỷ lục; NĐT cá nhân ồ ạt."},
+  {date:"2021-11-25",title:"VN-Index lần đầu ~1.500",dir:"up",sev:"high",note:"Đỉnh tiền rẻ."},
+  {date:"2022-01-06",title:"Đỉnh lịch sử ~1.528",dir:"down",sev:"high",note:"Trước chu kỳ siết chặt."},
+  {date:"2022-03-29",title:"Bắt ông Trịnh Văn Quyết (FLC)",dir:"down",sev:"extreme",note:"Khủng hoảng TPDN bắt đầu."},
+  {date:"2022-10-10",title:"Vạn Thịnh Phát — SCB",dir:"down",sev:"extreme",note:"Bán giải chấp lan rộng."},
+  {date:"2022-11-15",title:"Đáy ~874",dir:"down",sev:"extreme",note:"Margin call dây chuyền."},
+  {date:"2023-03-05",title:"Nghị định 08 gỡ khó TPDN",dir:"up",sev:"medium",note:"Thị trường hồi phục."},
+  {date:"2023-06-30",title:"NHNN hạ lãi suất 4 lần",dir:"up",sev:"high",note:"Dòng tiền quay lại cổ phiếu."},
+  {date:"2025-04-02",title:"Mỹ áp thuế 46% với VN",dir:"down",sev:"extreme",note:"Liberation Day; bán tháo mạnh."},
+  {date:"2025-04-03",title:"VN-Index giảm 88 điểm",dir:"down",sev:"extreme",note:"Mạnh nhất lịch sử theo điểm."},
+  {date:"2025-05-05",title:"Hệ thống KRX vận hành",dir:"up",sev:"high",note:"Nền tảng thanh khoản kỷ lục."},
+  {date:"2025-08-07",title:"Thuế Mỹ giảm về 20%",dir:"up",sev:"high",note:"Gỡ rủi ro thuế quan."},
+  {date:"2025-10-08",title:"FTSE nâng hạng VN",dir:"up",sev:"extreme",note:"Hiệu lực 21/9/2026; hút vốn ngoại."},
+  {date:"2025-12-25",title:"Đỉnh lịch sử ~1.806",dir:"up",sev:"high",note:"Cả năm +40,87%."},
 ];
 
-function eventsFor(sym){return EVENTS.filter(e=>sym==null||e.scope===INDEX_EV||(Array.isArray(e.scope)&&e.scope.includes(sym)));}
+function eventsFor(sym){return EVENTS;}
 function dayDiff(a,b){return Math.abs((new Date(a)-new Date(b))/86400000);}
-function detectBigMoves(e,sym,threshold=0.04,windowDays=5){
-  const evs=eventsFor(sym); const out=[];
+function detectBigMoves(e,threshold=0.04){
+  const evs=EVENTS,out=[];
   for(let i=1;i<e.close.length;i++){
     const r=e.close[i]/e.close[i-1]-1;
-    if(Math.abs(r)<threshold) continue;
-    let best=null,bestGap=1e9;
-    for(const ev of evs){const g=dayDiff(e.dates[i],ev.date);if(g<=windowDays&&g<bestGap){bestGap=g;best=ev;}}
+    if(Math.abs(r)<threshold)continue;
+    let best=null,bestG=1e9;
+    for(const ev of evs){const g=dayDiff(e.dates[i],ev.date);if(g<=5&&g<bestG){bestG=g;best=ev;}}
     out.push({date:e.dates[i],ret:r,close:e.close[i],event:best});
   }
   return out;
 }
 
-/* ===================================================================
-   8) API XUẤT RA
-   =================================================================== */
-const ACTIVE_UNIVERSE = IS_REAL && _REAL.universe ? _REAL.universe : SYN_UNIVERSE;
-const FUND_DATA = IS_REAL && _REAL.fundamentals ? _REAL.fundamentals : {};
+/* ── API xuất ra ────────────────────────────────────────────────────── */
+const ACTIVE_UNI    = IS_REAL?(_SIG.universe||{}): SYN_UNI;
+const ACTIVE_SIGS   = IS_REAL?(_SIG.signals||{}): {};
+const ACTIVE_FUND   = IS_REAL?(_SIG.fundamentals||{}): {};
+const ACTIVE_STOCKS = (_DATA&&_DATA.stocks)||{};
 
-function getOHLCV(sym) {
-  if (IS_REAL && _REAL.stocks[sym]) {
-    const s = _REAL.stocks[sym];
-    return {dates:s.dates,open:s.open,high:s.high,low:s.low,close:s.close,volume:s.volume};
-  }
-  if (!SYN_UNIVERSE[sym]) throw new Error("Không có dữ liệu cho mã "+sym);
-  return buildSynStock(sym);
-}
-
-const ENGINE = {
-  UNIVERSE: ACTIVE_UNIVERSE,
+const ENGINE={
+  UNIVERSE: ACTIVE_UNI,
   EVENTS,
-  WEIGHTS,
-  BUY_TH, SELL_TH,
   isReal: IS_REAL,
-  asof: IS_REAL && _REAL.asof ? _REAL.asof : null,
-  indexSeries: () => (IS_REAL && _REAL.index ? _REAL.index : _SYN_INDEX),
-  enrich, scoreAt, scoreSeries, reasonsAt, backtest,
-  eventsFor, detectBigMoves,
-  // Cơ bản
-  getFundamental: (sym) => FUND_DATA[sym] || null,
-  scoreFundamental,
-  fundGrade,
-  compositeScore,
-  // Phân tích đầy đủ 1 mã
-  analyze(sym) {
-    const e    = enrich(getOHLCV(sym));
-    const last = e.close.length - 1;
-    const tech = scoreAt(e, last);
-    const fund = scoreFundamental(FUND_DATA[sym] || null);
-    const comp = tech ? compositeScore(tech.total, fund) : null;
-    return { ...e, _tech: tech, _fund: fund, _comp: comp };
+  asof: IS_REAL?(_SIG.asof||null):null,
+  liqMin: IS_REAL?(_SIG.liq_min||50):0,
+
+  // Tín hiệu đã tính sẵn server-side (nhanh)
+  getSignal: (sym)=>ACTIVE_SIGS[sym]||null,
+  getAllSignals: ()=>ACTIVE_SIGS,
+  getFundamental: (sym)=>ACTIVE_FUND[sym]||null,
+  scoreFundamental, fundGrade,
+
+  // Lấy OHLCV và tính chỉ báo (cho tab chi tiết)
+  analyze(sym){
+    let ohlcv=null;
+    if(ACTIVE_STOCKS[sym]){
+      const s=ACTIVE_STOCKS[sym];
+      ohlcv={dates:s.dates,open:s.open,high:s.high,low:s.low,close:s.close,volume:s.volume};
+    } else if(SYN_UNI[sym]){
+      ohlcv=buildSynStock(sym);
+    }
+    if(!ohlcv)return null;
+    return enrich(ohlcv);
   },
+
+  indexSeries:()=>_IDX,
+  eventsFor, detectBigMoves,
 };
 
-if (typeof module !== "undefined" && module.exports) module.exports = ENGINE;
-root.ENGINE = ENGINE;
-})(typeof window !== "undefined" ? window : globalThis);
+if(typeof module!=="undefined"&&module.exports)module.exports=ENGINE;
+root.ENGINE=ENGINE;
+})(typeof window!=="undefined"?window:globalThis);
 
 </script>
 <script>
@@ -766,297 +406,255 @@ root.Charts = { render, attachHover, niceFmt };
 
 </script>
 <script>
-/* app.js v2 — Dashboard: kỹ thuật + cơ bản + điểm tổng hợp + biểu đồ nến */
-(function () {
+/* app.js v3 — Dashboard VN100: bảng tín hiệu 100 mã, lọc ngành, lazy chi tiết */
+(function(){
 "use strict";
-const E = window.ENGINE, CH = window.Charts;
-const CO = {
-  accent:"#4FD1C5", line:"#6AB7FF", amber:"#E0A23C",
-  buy:"#2DBE8B", sell:"#E5484D", muted:"#8B94A3",
-  grid:"rgba(139,148,163,.18)", panel:"#161B22", panel2:"#1C232C",
-  candleUp:"#2DBE8B", candleDown:"#E5484D",
-};
-const SIG_VI  = {BUY:"MUA", SELL:"BÁN", HOLD:"GIỮ"};
-const SIG_CLS = {BUY:"buy", SELL:"sell", HOLD:"hold"};
+const E=window.ENGINE, CH=window.Charts;
+const CO={accent:"#4FD1C5",line:"#6AB7FF",amber:"#E0A23C",
+  buy:"#2DBE8B",sell:"#E5484D",muted:"#8B94A3",
+  grid:"rgba(139,148,163,.18)",candleUp:"#2DBE8B",candleDown:"#E5484D"};
+const SIG_VI={BUY:"MUA",SELL:"BÁN",HOLD:"GIỮ"};
+const SIG_CLS={BUY:"buy",SELL:"sell",HOLD:"hold"};
+const ASOF=E.asof||E.indexSeries().dates.at(-1);
 
-/* ---------- cache phân tích ---------- */
-const cache = {};
-function analyze(sym) {
-  if (cache[sym]) return cache[sym];
-  const e    = E.analyze(sym);
-  const last = e.close.length - 1;
-  const sc   = e._comp || { score: 0, signal: "HOLD", hasFund: false };
-  const tech = e._tech;
-  const sigArr = E.scoreSeries(e).signal;
-  const bt     = E.backtest(e, sigArr);
-  cache[sym] = { e, last, sc, tech, bt };
-  return cache[sym];
+/* ── Cache chi tiết ─────────────────────────────────────── */
+const detailCache={};
+function getDetail(sym){
+  if(!detailCache[sym]) detailCache[sym]=E.analyze(sym);
+  return detailCache[sym];
 }
 
-const fmt0   = v => v == null ? "–" : Math.round(v).toLocaleString("vi-VN");
-const fmtPct = (v, d=1) => v == null ? "–" : (v*100).toFixed(d)+"%";
-const fmtNum = (v, d=1) => v == null ? "–" : v.toFixed(d);
-const ASOF   = E.asof || E.indexSeries().dates.at(-1);
+/* ── Format ─────────────────────────────────────────────── */
+const fmt0=v=>v==null?"–":Math.round(v).toLocaleString("vi-VN");
+const fmtPct=(v,d=1)=>v==null?"–":(v*100).toFixed(d)+"%";
+function badge(sig){return `<span class="badge ${SIG_CLS[sig]}">${SIG_VI[sig]}</span>`;}
+function fundBadge(g){return `<span class="fund-grade-sm" style="background:${g.color}22;color:${g.color};border:1px solid ${g.color}44">${g.grade}</span>`;}
 
-/* ===== BIỂU ĐỒ NẾN (candlestick qua canvas) ===== */
-function renderCandle(canvas, model) {
-  const W = canvas.clientWidth || canvas.parentElement.clientWidth || 700;
-  const H = parseInt(canvas.style.height) || 340;
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
-  canvas.style.width = W+"px"; canvas.style.height = H+"px";
-  const ctx = canvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
-  const {dates,open,high,low,close,sma20,sma50} = model;
-  const n = dates.length;
-  if(!n){return;}
-  const padL=56,padR=14,padT=14,padB=26;
-  const plotW=W-padL-padR, plotH=H-padT-padB;
+/* ── Biểu đồ nến ─────────────────────────────────────────── */
+function renderCandle(canvas,model){
+  const W=canvas.clientWidth||700,H=parseInt(canvas.style.height)||340;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+"px";canvas.style.height=H+"px";
+  const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);
+  const{dates,open,high,low,close,sma20,sma50}=model;
+  const n=dates.length;if(!n)return;
+  const pL=56,pR=14,pT=14,pB=26,pW=W-pL-pR,pH=H-pT-pB;
   ctx.clearRect(0,0,W,H);
-
-  // y range từ high/low
   let lo=Infinity,hi=-Infinity;
-  for(let i=0;i<n;i++){if(high[i]<lo||lo===Infinity){}; lo=Math.min(lo,low[i]||Infinity); hi=Math.max(hi,high[i]||0);}
-  for(const arr of [sma20,sma50]) if(arr) for(const v of arr) if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v);}
-  const pad=(hi-lo)*0.06||1; lo-=pad; hi+=pad;
-
-  const X = i => padL + (i+0.5)/n * plotW;
-  const Y = v => padT + plotH - (v-lo)/(hi-lo)*plotH;
-  const cw = Math.max(1, Math.floor(plotW/n*0.65));
-
-  // grid
-  ctx.font=`11px 'JetBrains Mono',monospace`; ctx.textBaseline="middle";
+  for(let i=0;i<n;i++){if(low[i]<lo)lo=low[i];if(high[i]>hi)hi=high[i];}
+  if(sma20)for(const v of sma20)if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v);}
+  if(sma50)for(const v of sma50)if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v);}
+  const pad=(hi-lo)*0.06||1;lo-=pad;hi+=pad;
+  const X=i=>pL+(i+0.5)/n*pW;
+  const Y=v=>pT+pH-(v-lo)/(hi-lo)*pH;
+  const cw=Math.max(1,Math.floor(pW/n*0.6));
+  ctx.font="11px 'JetBrains Mono',monospace";ctx.textBaseline="middle";
   for(let t=0;t<=5;t++){
-    const v=lo+(hi-lo)*t/5, y=Y(v);
-    ctx.strokeStyle=CO.grid; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
-    ctx.fillStyle=CO.muted; ctx.textAlign="right";
-    ctx.fillText(CH.niceFmt(v), padL-8, y);
+    const v=lo+(hi-lo)*t/5,y=Y(v);
+    ctx.strokeStyle=CO.grid;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pR,y);ctx.stroke();
+    ctx.fillStyle=CO.muted;ctx.textAlign="right";ctx.fillText(CH.niceFmt(v),pL-8,y);
   }
-  // x labels
-  ctx.textAlign="center"; ctx.textBaseline="top";
-  const xt = Math.min(7,n);
-  for(let t=0;t<xt;t++){
-    const i=Math.round(t/(xt-1)*(n-1));
-    ctx.fillStyle=CO.muted; ctx.fillText(dates[i].slice(0,7), X(i), H-padB+6);
+  ctx.textAlign="center";ctx.textBaseline="top";
+  for(let t=0;t<Math.min(7,n);t++){
+    const i=Math.round(t/(Math.min(7,n)-1)*(n-1));
+    ctx.fillStyle=CO.muted;ctx.fillText(dates[i].slice(0,7),X(i),H-pB+6);
   }
-  // MA lines
   [[sma20,CO.amber],[sma50,CO.accent]].forEach(([arr,col])=>{
-    if(!arr) return;
-    ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.setLineDash([]);
-    ctx.beginPath(); let started=false;
-    for(let i=0;i<n;i++){if(arr[i]==null){started=false;continue;} started?ctx.lineTo(X(i),Y(arr[i])):ctx.moveTo(X(i),Y(arr[i])); started=true;}
+    if(!arr)return;ctx.strokeStyle=col;ctx.lineWidth=1.3;ctx.setLineDash([]);
+    ctx.beginPath();let s=false;
+    for(let i=0;i<n;i++){if(arr[i]==null){s=false;continue;}s?ctx.lineTo(X(i),Y(arr[i])):ctx.moveTo(X(i),Y(arr[i]));s=true;}
     ctx.stroke();
   });
-  // nến
   for(let i=0;i<n;i++){
-    const o=open[i],h2=high[i],l2=low[i],c=close[i];
-    if(o==null||c==null) continue;
-    const isUp = c >= o;
-    const col = isUp ? CO.candleUp : CO.candleDown;
-    const x = X(i);
-    // bóng
-    ctx.strokeStyle=col; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(x,Y(h2)); ctx.lineTo(x,Y(l2)); ctx.stroke();
-    // thân
-    const yTop=Y(Math.max(o,c)), yBot=Y(Math.min(o,c));
-    const bodyH=Math.max(1,yBot-yTop);
-    ctx.fillStyle=isUp?col+"44":col;
-    ctx.strokeStyle=col; ctx.lineWidth=1;
-    ctx.fillRect(x-cw/2, yTop, cw, bodyH);
-    ctx.strokeRect(x-cw/2, yTop, cw, bodyH);
+    const o=open[i],h2=high[i],l2=low[i],c=close[i];if(o==null||c==null)continue;
+    const isUp=c>=o,col=isUp?CO.candleUp:CO.candleDown,x=X(i);
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,Y(h2));ctx.lineTo(x,Y(l2));ctx.stroke();
+    const yT=Y(Math.max(o,c)),bH=Math.max(1,Y(Math.min(o,c))-yT);
+    ctx.fillStyle=isUp?col+"44":col;ctx.strokeStyle=col;ctx.lineWidth=1;
+    ctx.fillRect(x-cw/2,yT,cw,bH);ctx.strokeRect(x-cw/2,yT,cw,bH);
   }
-  // cross-hair khi hover (lưu geom)
-  canvas.__cgeom = {X,Y,padL,padR,padT,padB,n,W,H,dates,open,high,low,close};
-  canvas.__cmodel = model;
+  canvas.__cgeom={X,Y,dates,open,high,low,close,n,W,H,pL,pR,pT,pB};
+  canvas.__cmodel=model;
 }
-
-function attachCandleHover(canvas, readoutEl) {
-  function move(ev) {
-    const g=canvas.__cgeom, m=canvas.__cmodel; if(!g||!m) return;
-    const rect=canvas.getBoundingClientRect();
-    const px=ev.clientX-rect.left;
-    let i=Math.round(px/g.W*g.n - 0.5);
-    i=Math.max(0,Math.min(g.n-1,i));
-    renderCandle(canvas,m);
-    const ctx=canvas.getContext("2d");
-    const x=g.X(i);
-    ctx.strokeStyle=CO.accent; ctx.lineWidth=1; ctx.setLineDash([3,3]);
-    ctx.beginPath(); ctx.moveTo(x,g.padT); ctx.lineTo(x,g.H-g.padB); ctx.stroke();
-    ctx.setLineDash([]);
-    if(readoutEl){
-      const o=g.open[i],h2=g.high[i],l=g.low[i],c=g.close[i];
-      const chg=i>0&&g.close[i-1]?(c/g.close[i-1]-1)*100:0;
-      const col=chg>=0?CO.buy:CO.sell;
-      readoutEl.innerHTML=`<b>${g.dates[i]}</b> &nbsp; `+
-        `M<span class="mono"> ${CH.niceFmt(o)}</span> `+
-        `C<span class="mono" style="color:${col}"> ${CH.niceFmt(c)}</span> `+
+function attachCandleHover(cv,el){
+  cv.addEventListener("mousemove",ev=>{
+    const g=cv.__cgeom,m=cv.__cmodel;if(!g||!m)return;
+    const r=cv.getBoundingClientRect(),px=ev.clientX-r.left;
+    let i=Math.round(px/g.W*g.n-0.5);i=Math.max(0,Math.min(g.n-1,i));
+    renderCandle(cv,m);
+    const ctx=cv.getContext("2d");
+    ctx.strokeStyle=CO.accent;ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(g.X(i),g.pT);ctx.lineTo(g.X(i),g.H-g.pB);ctx.stroke();ctx.setLineDash([]);
+    if(el){
+      const c=g.close[i],chg=i>0&&g.close[i-1]?(c/g.close[i-1]-1)*100:0;
+      el.innerHTML=`<b>${g.dates[i]}</b> &nbsp;`+
+        `M<span class="mono"> ${CH.niceFmt(g.open[i])}</span> `+
+        `C<span class="mono" style="color:${chg>=0?CO.buy:CO.sell}"> ${CH.niceFmt(c)}</span> `+
         `(${chg>=0?"+":""}${chg.toFixed(2)}%) `+
-        `H<span class="mono"> ${CH.niceFmt(h2)}</span> `+
-        `L<span class="mono"> ${CH.niceFmt(l)}</span>`;
+        `H<span class="mono"> ${CH.niceFmt(g.high[i])}</span> `+
+        `L<span class="mono"> ${CH.niceFmt(g.low[i])}</span>`;
     }
-  }
-  canvas.addEventListener("mousemove",move);
-  canvas.addEventListener("mouseleave",()=>{
-    if(canvas.__cmodel) renderCandle(canvas,canvas.__cmodel);
-    if(readoutEl) readoutEl.innerHTML="";
   });
+  cv.addEventListener("mouseleave",()=>{if(cv.__cmodel)renderCandle(cv,cv.__cmodel);if(el)el.innerHTML="";});
 }
 
-/* ===== THÀNH PHẦN DÙNG LẠI ===== */
-function meterHTML(score) {
+/* ── Meter + Group bars ─────────────────────────────────── */
+function meterHTML(score){
   const pos=((score+1)/2*100).toFixed(1);
-  return `<div class="meter">
-    <div class="meter-track">
-      <div class="meter-zone z-sell"></div><div class="meter-zone z-hold"></div><div class="meter-zone z-buy"></div>
-      <div class="meter-mark" style="left:${pos}%"></div>
-    </div>
-    <div class="meter-labels"><span>Bán −1</span><span>0</span><span>+1 Mua</span></div>
-  </div>`;
+  return `<div class="meter"><div class="meter-track">
+    <div class="meter-zone z-sell"></div><div class="meter-zone z-hold"></div><div class="meter-zone z-buy"></div>
+    <div class="meter-mark" style="left:${pos}%"></div></div>
+    <div class="meter-labels"><span>Bán −1</span><span>0</span><span>+1 Mua</span></div></div>`;
 }
-function groupBarsHTML(tech) {
-  const groups=[["Xu hướng",tech.sTrend,.30],["Động lượng",tech.sMom,.25],
-    ["Biến động",tech.sVol,.20],["Khối lượng",tech.sVolu,.15],["Sức mạnh",tech.sStr,.10]];
+function groupBarsHTML(sig){
+  const groups=[
+    ["Xu hướng",  sig.s_trend,  .276],
+    ["Động lượng",sig.s_mom,    .281],
+    ["Biến động", sig.s_vol,    .095],
+    ["Khối lượng",sig.s_volume, .173],
+    ["Sức mạnh",  sig.s_str,    .175],
+  ];
   return `<div class="gbars">`+groups.map(([n,v,w])=>{
-    const w2=Math.abs(v)*50, side=v>=0?"right":"left", col=v>=0?"var(--buy)":"var(--sell)";
-    return `<div class="gbar">
+    if(v==null)return"";
+    const w2=Math.abs(v)*50,side=v>=0?"right":"left",col=v>=0?"var(--buy)":"var(--sell)";
+    return`<div class="gbar">
       <div class="gbar-name">${n} <span class="gbar-w">w${w}</span></div>
       <div class="gbar-track"><div class="gbar-mid"></div>
-        <div class="gbar-fill" style="${side}:50%;width:${w2}%;background:${col}"></div></div>
-      <div class="gbar-val" style="color:${col}">${v>=0?"+":""}${v.toFixed(2)}</div>
-    </div>`;
+      <div class="gbar-fill" style="${side}:50%;width:${w2}%;background:${col}"></div></div>
+      <div class="gbar-val" style="color:${col}">${v>=0?"+":""}${v.toFixed(2)}</div></div>`;
   }).join("")+`</div>`;
-}
-function badge(sig) { return `<span class="badge ${SIG_CLS[sig]}">${SIG_VI[sig]}</span>`; }
-function kpi(label,val,ctx,ctxColor) {
-  return `<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono">${val}</div>${ctx?`<div class="kpi-c" style="${ctxColor?"color:"+ctxColor:""}">${ctx}</div>`:""}</div>`;
-}
-function fundBadge(grade,color,desc){
-  return `<span class="fund-grade" style="background:${color}22;color:${color};border-color:${color}44">${grade}</span>
-          <span class="fund-desc">${desc}</span>`;
 }
 
 /* ============ 1) BẢNG TÍN HIỆU ============ */
-let tableFilter="ALL", tableSort="score";
-function renderTable() {
-  const rows = Object.keys(E.UNIVERSE).map(sym => {
-    const a=analyze(sym); const e=a.e, i=a.last;
+let tFilter="ALL", tSector="ALL", tSearch="";
+function renderTable(){
+  const allSigs=E.getAllSignals();
+  const syms=Object.keys(allSigs);
+  const uni=E.UNIVERSE;
+
+  // Lấy danh sách ngành
+  const sectors=[...new Set(Object.values(uni).map(u=>u.sector||"").filter(Boolean))].sort();
+
+  let rows=syms.map(sym=>{
+    const s=allSigs[sym];
     const fund=E.getFundamental(sym)||{};
     const fundScore=E.scoreFundamental(fund);
     const grade=E.fundGrade(fundScore);
-    return {
-      sym, name:E.UNIVERSE[sym].name, sector:E.UNIVERSE[sym].sector,
-      price:e.close[i], chg:e.close[i]/e.close[i-1]-1,
-      sig:a.sc.signal, score:a.sc.score||a.sc.total||0,
-      techScore:a.tech?a.tech.total:0, fundScore,
-      grade, rsi:e.rsi[i], adx:e.adx[i],
-      pe:fund.pe, roe:fund.roe,
-      reasons:E.reasonsAt(e,i),
-    };
-  }).sort((x,y)=>Math.abs(y.score)-Math.abs(x.score));
+    return{sym,name:uni[sym]?.name||sym,sector:uni[sym]?.sector||"",
+      ...s,fundScore,grade,fund};
+  });
 
-  const filt=rows.filter(r=>tableFilter==="ALL"||r.sig===tableFilter);
-  const nBuy=rows.filter(r=>r.sig==="BUY").length, nSell=rows.filter(r=>r.sig==="SELL").length;
+  // Lọc
+  if(tFilter!=="ALL") rows=rows.filter(r=>r.signal===tFilter);
+  if(tSector!=="ALL") rows=rows.filter(r=>r.sector===tSector);
+  if(tSearch) rows=rows.filter(r=>r.sym.includes(tSearch.toUpperCase())||r.name.includes(tSearch));
+  rows.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
 
-  const body=filt.map(r=>`<tr onclick="APP.goDetail('${r.sym}')">
-    <td><div class="t-sym">${r.sym}</div><div class="t-name">${r.name} <span class="sector-tag">${r.sector}</span></div></td>
-    <td class="mono">${fmt0(r.price)}</td>
-    <td class="mono" style="color:${r.chg>=0?CO.buy:CO.sell}">${r.chg>=0?"+":""}${(r.chg*100).toFixed(2)}%</td>
-    <td>${badge(r.sig)}</td>
-    <td class="mono">${r.score>=0?"+":""}${r.score.toFixed(2)}</td>
-    <td class="mono">${r.rsi==null?"–":r.rsi.toFixed(0)}</td>
-    <td><span class="fund-grade-sm" style="background:${r.grade.color}22;color:${r.grade.color}">${r.grade.grade}</span></td>
-    <td class="mono">${r.pe==null?"–":r.pe.toFixed(1)}</td>
-    <td class="mono">${r.roe==null?"–":(r.roe>1?r.roe.toFixed(1):(r.roe*100).toFixed(1))+"%"}</td>
-    <td class="t-reason">${r.reasons[0]||"—"}</td>
+  const nBuy=rows.filter(r=>r.signal==="BUY").length;
+  const nSell=rows.filter(r=>r.signal==="SELL").length;
+  const allBuy=Object.values(allSigs).filter(s=>s.signal==="BUY").length;
+  const allSell=Object.values(allSigs).filter(s=>s.signal==="SELL").length;
+
+  const sectorOpts=`<option value="ALL">Tất cả ngành</option>`+
+    sectors.map(s=>`<option value="${s}" ${s===tSector?"selected":""}>${s}</option>`).join("");
+
+  const body=rows.map(r=>`<tr onclick="APP.goDetail('${r.sym}')">
+    <td><div class="t-sym">${r.sym}</div><div class="t-name">${r.name}</div></td>
+    <td><span class="sector-tag">${r.sector||"—"}</span></td>
+    <td class="mono">${fmt0(r.close)}</td>
+    <td class="mono" style="color:${(r.chg_pct||0)>=0?CO.buy:CO.sell}">${(r.chg_pct||0)>=0?"+":""}${(r.chg_pct||0).toFixed(2)}%</td>
+    <td>${badge(r.signal)}</td>
+    <td class="mono">${r.score>=0?"+":""}${r.score.toFixed(3)}</td>
+    <td class="mono">${r.rsi||"–"}</td>
+    <td>${fundBadge(r.grade)}</td>
+    <td class="mono">${r.fund.pe?.toFixed(1)||"–"}</td>
+    <td class="mono">${r.fund.roe==null?"–":((r.fund.roe>1?r.fund.roe:r.fund.roe*100).toFixed(1)+"%")}</td>
+    <td class="mono liq">${r.gtgd_bn?.toFixed(0)||"–"} tỷ</td>
   </tr>`).join("");
 
   document.getElementById("view-table").innerHTML=`
-    <div class="row-between">
+    <div class="row-between" style="margin-bottom:10px">
       <div>
         <h2>Bảng tín hiệu — phiên ${ASOF}</h2>
-        <p class="muted">Điểm tổng hợp = 60% kỹ thuật + 40% cơ bản. Tín hiệu MUA bị lọc khi tài chính yếu.
-        ${nBuy} MUA · ${nSell} BÁN · ${rows.length-nBuy-nSell} GIỮ. Nhấp một dòng để xem chi tiết.</p>
+        <p class="muted">Lọc: ≥${E.liqMin||50} tỷ/phiên | Tổng thị trường: ${allBuy} MUA · ${allSell} BÁN · ${syms.length-allBuy-allSell} GIỮ · Điểm = WFO(40%)+IC(35%)+GS(25%)</p>
       </div>
-      <div class="seg">
-        ${["ALL","BUY","SELL"].map(f=>`<button class="${tableFilter===f?"on":""}" onclick="APP.setFilter('${f}')">${f==="ALL"?"Tất cả":SIG_VI[f]}</button>`).join("")}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input class="search-box" id="tbl-search" placeholder="Tìm mã…" value="${tSearch}"
+               oninput="APP.setSearch(this.value)">
+        <select class="sel sm" onchange="APP.setSector(this.value)">${sectorOpts}</select>
+        <div class="seg sm">
+          ${["ALL","BUY","SELL"].map(f=>`<button class="${tFilter===f?"on":""}" onclick="APP.setFilter('${f}')">${f==="ALL"?"Tất cả":SIG_VI[f]}</button>`).join("")}
+        </div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="padding:0;overflow:hidden">
       <table class="grid">
-        <thead><tr><th>Mã</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th><th>Điểm</th><th>RSI</th><th>Cơ bản</th><th>P/E</th><th>ROE</th><th>Lý do KT</th></tr></thead>
-        <tbody>${body}</tbody>
+        <thead><tr><th>Mã</th><th>Ngành</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
+          <th>Điểm</th><th>RSI</th><th>Cơ bản</th><th>P/E</th><th>ROE</th><th>GTGD</th></tr></thead>
+        <tbody>${body||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
       </table>
-    </div>`;
+    </div>
+    <p class="muted small">Hiển thị ${rows.length}/${syms.length} mã. Nhấp một dòng để xem chi tiết biểu đồ nến & phân tích.</p>`;
 }
 
 /* ============ 2) PHÂN TÍCH MÃ ============ */
-let curSym="VCB", curRange=500;
-function renderDetail() {
-  const a=analyze(curSym); const e=a.e, i=a.last, sc=a.sc, tech=a.tech;
+let curSym=Object.keys(E.UNIVERSE)[0]||"VCB", curRange=500;
+function renderDetail(){
+  const sig=E.getSignal(curSym);
   const fund=E.getFundamental(curSym)||{};
   const fundScore=E.scoreFundamental(fund);
   const grade=E.fundGrade(fundScore);
-  const reasons=E.reasonsAt(e,i);
-  const opts=Object.keys(E.UNIVERSE).map(s=>`<option value="${s}" ${s===curSym?"selected":""}>${s} — ${E.UNIVERSE[s].name}</option>`).join("");
+  const e=getDetail(curSym);
+  const uni=E.UNIVERSE;
+  const opts=Object.keys(uni).map(s=>`<option value="${s}" ${s===curSym?"selected":""}>${s} — ${uni[s].name||s}</option>`).join("");
   const rngBtns=[[126,"6T"],[250,"1N"],[500,"2N"],[9999,"Tất cả"]]
     .map(([v,l])=>`<button class="${curRange===v?"on":""}" onclick="APP.setRange(${v})">${l}</button>`).join("");
+
+  const scoreVal=sig?sig.score:0;
+  const signalVal=sig?sig.signal:"HOLD";
 
   document.getElementById("view-detail").innerHTML=`
     <div class="row-between">
       <h2>Phân tích mã</h2>
       <select class="sel" onchange="APP.pick(this.value)">${opts}</select>
     </div>
-
-    <!-- Hàng 1: Tín hiệu tổng hợp -->
     <div class="grid3">
-      <div class="card verdict ${SIG_CLS[sc.signal]}">
+      <div class="card verdict ${SIG_CLS[signalVal]}">
         <div class="muted">Tín hiệu tổng hợp — ${ASOF}</div>
-        <div class="verdict-big">${badge(sc.signal)} <span class="mono vscore">${(sc.score||0)>=0?"+":""}${(sc.score||0).toFixed(3)}</span></div>
-        ${meterHTML(sc.score||0)}
-        <div style="margin-top:12px;font-size:11.5px;color:var(--muted)">
-          ${sc.hasFund
-            ? `Kỹ thuật ${(tech.total>=0?"+":"")+tech.total.toFixed(2)} &nbsp;·&nbsp; Cơ bản ${(fundScore>=0?"+":"")+fundScore.toFixed(2)}`
-            : `Kỹ thuật ${(tech?((tech.total>=0?"+":"")+tech.total.toFixed(2)):"–")} &nbsp;·&nbsp; Cơ bản: chưa có dữ liệu`}
-        </div>
-        ${tech?groupBarsHTML(tech):""}
-        <div class="reasons">${reasons.length?reasons.map(r=>`<span class="chip">${r}</span>`).join(""):"<span class='muted'>Không có tín hiệu nổi bật.</span>"}</div>
+        <div class="verdict-big"><span class="badge ${SIG_CLS[signalVal]}">${SIG_VI[signalVal]}</span>
+          <span class="mono vscore">${scoreVal>=0?"+":""}${scoreVal.toFixed(3)}</span></div>
+        ${meterHTML(scoreVal)}
+        ${sig?groupBarsHTML(sig):""}
       </div>
-
-      <!-- Sức khỏe tài chính -->
       <div class="card">
         <div class="muted" style="margin-bottom:10px">Sức khoẻ tài chính</div>
-        <div class="fund-header">${fundBadge(grade.grade, grade.color, grade.desc)}</div>
+        <div class="fund-header">${fundBadge(grade)} <span class="fund-desc">${grade.desc}</span></div>
         <div class="fund-kpis">
-          ${fundKpi("P/E", fund.pe, v=>v<10?"Rẻ":v<20?"Hợp lý":"Đắt", v=>v<10?CO.buy:v<20?CO.amber:CO.sell)}
-          ${fundKpi("P/B", fund.pb, v=>v<1?"Rẻ":v<2.5?"Bình thường":"Cao", v=>v<1?CO.buy:v<2.5?CO.amber:CO.sell)}
-          ${fundKpi("ROE", fund.roe==null?null:(fund.roe>1?fund.roe:fund.roe*100), v=>`${v.toFixed(1)}%`, null, v=>v>20?CO.buy:v>10?CO.amber:CO.sell, true)}
-          ${fundKpi("ROA", fund.roa==null?null:(fund.roa>1?fund.roa:fund.roa*100), v=>`${v.toFixed(1)}%`, null, v=>v>8?CO.buy:v>4?CO.amber:CO.sell, true)}
-          ${fundKpi("Tăng trưởng EPS", fund.eps_growth==null?null:(fund.eps_growth>1?fund.eps_growth:fund.eps_growth*100), v=>`${v>=0?"+":""}${v.toFixed(1)}%`, null, v=>v>20?CO.buy:v>0?CO.amber:CO.sell, true)}
-          ${fundKpi("Tăng trưởng DT", fund.revenue_growth==null?null:(fund.revenue_growth>1?fund.revenue_growth:fund.revenue_growth*100), v=>`${v>=0?"+":""}${v.toFixed(1)}%`, null, v=>v>15?CO.buy:v>0?CO.amber:CO.sell, true)}
+          ${fKpi("P/E",fund.pe,v=>v<10?"Rẻ":v<20?"Hợp lý":"Đắt",v=>v<10?CO.buy:v<20?CO.amber:CO.sell)}
+          ${fKpi("P/B",fund.pb,null,v=>v<1?CO.buy:v<2.5?CO.amber:CO.sell)}
+          ${fKpi("ROE%",fund.roe==null?null:(fund.roe>1?fund.roe:fund.roe*100),v=>v.toFixed(1)+"%",v=>v>20?CO.buy:v>10?CO.amber:CO.sell)}
+          ${fKpi("ROA%",fund.roa==null?null:(fund.roa>1?fund.roa:fund.roa*100),v=>v.toFixed(1)+"%",v=>v>8?CO.buy:v>3?CO.amber:CO.sell)}
+          ${fKpi("EPS tăng%",fund.eps_growth==null?null:(fund.eps_growth>1?fund.eps_growth:fund.eps_growth*100),v=>(v>=0?"+":"")+v.toFixed(1)+"%",v=>v>20?CO.buy:v>0?CO.amber:CO.sell)}
+          ${fKpi("GTGD",sig?sig.gtgd_bn:null,v=>v.toFixed(0)+" tỷ",null)}
         </div>
       </div>
-
-      <!-- Chỉ báo kỹ thuật -->
       <div class="card">
         <div class="muted" style="margin-bottom:10px">Chỉ báo kỹ thuật</div>
         <div class="kpis">
-          ${kpi("Giá đóng cửa", fmt0(e.close[i])+" đ")}
-          ${kpi("RSI (14)", e.rsi[i]==null?"–":e.rsi[i].toFixed(1), e.rsi[i]<30?"Quá bán":e.rsi[i]>70?"Quá mua":e.rsi[i]>=50?"Khỏe":"Yếu", e.rsi[i]<30?CO.buy:e.rsi[i]>70?CO.sell:null)}
-          ${kpi("ADX (14)", e.adx[i]==null?"–":e.adx[i].toFixed(1), e.adx[i]>25?"Xu hướng mạnh":"Đi ngang", e.adx[i]>25?CO.accent:null)}
-          ${kpi("MACD hist", e.macdHist[i]==null?"–":e.macdHist[i].toFixed(0), e.macdHist[i]>0?"Dương (tích cực)":"Âm (tiêu cực)", e.macdHist[i]>0?CO.buy:CO.sell)}
-          ${kpi("Bollinger %b", e.bbPctb[i]==null?"–":(e.bbPctb[i]*100).toFixed(0)+"%", e.bbPctb[i]<0.05?"Chạm dải dưới":e.bbPctb[i]>0.95?"Chạm dải trên":"Trong dải")}
-          ${kpi("ATR (14)", e.atr[i]==null?"–":fmt0(e.atr[i]), "Biến động/phiên")}
+          ${kpi("Giá đóng cửa",fmt0(sig?.close)+" đ")}
+          ${kpi("RSI (14)",sig?.rsi||"–",sig?.rsi<30?"Quá bán":sig?.rsi>70?"Quá mua":"Trung tính",sig?.rsi<30?CO.buy:sig?.rsi>70?CO.sell:null)}
+          ${kpi("ADX (14)",sig?.adx||"–",sig?.adx>25?"Xu hướng mạnh":"Đi ngang",sig?.adx>25?CO.accent:null)}
+          ${kpi("MACD hist",sig?.macd_hist||"–",sig?.macd_hist>0?"Dương":"Âm",sig?.macd_hist>0?CO.buy:CO.sell)}
         </div>
       </div>
     </div>
-
-    <!-- Biểu đồ nến -->
     <div class="card">
       <div class="row-between">
         <div class="muted">Biểu đồ nến — ${curSym}</div>
         <div class="seg sm">${rngBtns}</div>
       </div>
-      <canvas id="cv-candle"></canvas>
+      <canvas id="cv-candle" style="height:360px"></canvas>
       <div class="readout" id="ro-candle"></div>
       <div class="legend2">
         <span><i style="background:${CO.candleUp}"></i>Tăng</span>
@@ -1066,117 +664,119 @@ function renderDetail() {
       </div>
     </div>`;
 
-  // Vẽ biểu đồ nến
-  const k=Math.min(curRange, e.close.length);
-  const sl=arr=>arr?arr.slice(e.close.length-k):null;
-  const cv=document.getElementById("cv-candle"); cv.style.height="360px";
-  renderCandle(cv, {
-    dates:sl(e.dates), open:sl(e.open), high:sl(e.high), low:sl(e.low), close:sl(e.close),
-    sma20:sl(e.sma20), sma50:sl(e.sma50),
-  });
-  attachCandleHover(cv, document.getElementById("ro-candle"));
+  if(e){
+    const k=Math.min(curRange,e.close.length);
+    const sl=arr=>arr?arr.slice(e.close.length-k):null;
+    const cv=document.getElementById("cv-candle");
+    renderCandle(cv,{dates:sl(e.dates),open:sl(e.open),high:sl(e.high),
+      low:sl(e.low),close:sl(e.close),sma20:sl(e.sma20),sma50:sl(e.sma50)});
+    attachCandleHover(cv,document.getElementById("ro-candle"));
+  }
 }
-
-function fundKpi(label, val, fmtFn, ctxFn, colorFn, pctMode) {
-  if (val == null) return `<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono muted">–</div></div>`;
-  const display = fmtFn ? fmtFn(val) : (pctMode ? val.toFixed(1)+"%" : val.toFixed(1));
-  const ctx = ctxFn ? ctxFn(val) : null;
-  const color = colorFn ? colorFn(val) : null;
-  return `<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono" style="${color?"color:"+color:""}">${display}</div>${ctx?`<div class="kpi-c">${ctx}</div>`:""}</div>`;
+function fKpi(label,val,fmtFn,colorFn){
+  if(val==null)return`<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono muted">–</div></div>`;
+  const display=fmtFn?fmtFn(val):val.toFixed(1);
+  const color=colorFn?colorFn(val):null;
+  return`<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono" style="${color?"color:"+color:""}">${display}</div></div>`;
+}
+function kpi(label,val,ctx,ctxColor){
+  return`<div class="kpi"><div class="kpi-l">${label}</div><div class="kpi-v mono">${val}</div>${ctx?`<div class="kpi-c" style="${ctxColor?"color:"+ctxColor:""}">${ctx}</div>`:""}</div>`;
 }
 
 /* ============ 3) KIỂM ĐỊNH ============ */
-let btSym="VCB";
-function renderBacktest() {
-  const a=analyze(btSym); const bt=a.bt, m=bt.metrics, e=a.e;
-  const opts=Object.keys(E.UNIVERSE).map(s=>`<option value="${s}" ${s===btSym?"selected":""}>${s} — ${E.UNIVERSE[s].name}</option>`).join("");
-  const beat=m.totalRet>bt.buyHold;
-  const norm=bt.equity.map(v=>v/100000000*100);
-  const bh=e.close.map(v=>v/e.close[0]*100);
-
+let btSym=Object.keys(E.UNIVERSE)[0]||"VCB";
+function renderBacktest(){
+  const e=getDetail(btSym);
+  if(!e){document.getElementById("view-backtest").innerHTML=`<p class="muted">Không có dữ liệu chi tiết cho mã ${btSym}.</p>`;return;}
+  const sig=E.getSignal(btSym);
+  const sigArr=e.close.map((_,i)=>{
+    if(i<50||e.sma20[i]==null)return"HOLD";
+    const sc=(sig?.s_trend||0)*0.276+(sig?.s_mom||0)*0.281+(sig?.s_vol||0)*0.095
+            +(sig?.s_volume||0)*0.173+(sig?.s_str||0)*0.175;
+    return sc>=0.25?"BUY":sc<=-0.25?"SELL":"HOLD";
+  });
+  // Backtest đơn giản
+  let cash=100000000,shares=0,openP=0;
+  const equity=[],trades=[];
+  for(let i=0;i<e.close.length;i++){
+    const p=e.close[i],a=i===0?"HOLD":sigArr[i-1];
+    if(a==="BUY"&&shares===0){const f=cash*0.0015;shares=(cash-f)/p;openP=p;cash=0;}
+    else if(a==="SELL"&&shares>0){const pr=shares*p,f=pr*0.0025;cash=pr-f;trades.push((p-openP)/openP);shares=0;}
+    equity.push(cash+shares*p);
+  }
+  const final=equity.at(-1),ret=final/100000000-1;
+  const dret=equity.slice(1).map((v,i)=>v/equity[i]-1);
+  const m=dret.reduce((a,b)=>a+b,0)/dret.length;
+  const sd=Math.sqrt(dret.reduce((a,b)=>a+(b-m)**2,0)/dret.length);
+  const sharpe=sd>0?m/sd*Math.sqrt(250):0;
+  let peak=-Infinity,maxDD=0;
+  for(const v of equity){if(v>peak)peak=v;const dd=v/peak-1;if(dd<maxDD)maxDD=dd;}
+  const bh=e.close.at(-1)/e.close[0]-1;
+  const wrate=trades.length?trades.filter(t=>t>0).length/trades.length:0;
+  const opts=Object.keys(E.UNIVERSE).map(s=>`<option value="${s}" ${s===btSym?"selected":""}>${s} — ${E.UNIVERSE[s].name||s}</option>`).join("");
+  const norm=equity.map(v=>v/100000000*100);
+  const bh_=e.close.map(v=>v/e.close[0]*100);
   document.getElementById("view-backtest").innerHTML=`
-    <div class="row-between">
-      <div><h2>Kiểm định chiến lược (2014 → ${ASOF})</h2>
-      <p class="muted">Vốn 100 triệu. Tín hiệu tổng hợp (kỹ thuật + cơ bản). Phí 0,15%/chiều, thuế bán 0,1%.</p></div>
-      <select class="sel" onchange="APP.pickBt(this.value)">${opts}</select>
-    </div>
+    <div class="row-between"><div><h2>Kiểm định chiến lược</h2><p class="muted">Vốn 100 triệu · phí 0.15%/chiều · thuế bán 0.1%</p></div>
+    <select class="sel" onchange="APP.pickBt(this.value)">${opts}</select></div>
     <div class="mgrid">
-      ${metric("Lợi nhuận chiến lược", fmtPct(m.totalRet,0), beat?"buy":"sell")}
-      ${metric("Mua &amp; giữ", fmtPct(bt.buyHold,0))}
-      ${metric("CAGR", fmtPct(m.cagr,1))}
-      ${metric("Sharpe", m.sharpe==null?"–":m.sharpe.toFixed(2))}
-      ${metric("Sụt giảm tối đa", fmtPct(m.maxDD,0), "sell")}
-      ${metric("Tỷ lệ thắng", fmtPct(m.winRate,0))}
-      ${metric("Số lệnh", m.numTrades)}
-      ${metric("Profit factor", m.profitFactor==null?"–":m.profitFactor.toFixed(2))}
+      ${metric("Lợi nhuận CL",fmtPct(ret,0),ret>bh?"buy":"sell")}
+      ${metric("Mua &amp; giữ",fmtPct(bh,0))}
+      ${metric("Sharpe",sharpe.toFixed(2))}
+      ${metric("MDD",fmtPct(maxDD,0),"sell")}
+      ${metric("Số lệnh",trades.length)}
+      ${metric("Tỷ lệ thắng",fmtPct(wrate,0))}
     </div>
     <div class="card">
-      <div class="muted">Đường vốn: chiến lược vs mua-và-giữ (chuẩn hóa = 100)</div>
-      <canvas id="cv-eq"></canvas>
-      <div class="readout" id="ro-eq"></div>
+      <div class="muted">Đường vốn (chuẩn hoá = 100)</div>
+      <canvas id="cv-eq" style="height:300px"></canvas><div class="readout" id="ro-eq"></div>
       <div class="legend2"><span><i style="background:${CO.accent}"></i>Chiến lược</span><span><i style="background:${CO.muted}"></i>Mua &amp; giữ</span></div>
     </div>
-    <p class="muted small">Kết quả quá khứ không bảo đảm tương lai. Đây là công cụ hỗ trợ, không phải khuyến nghị đầu tư.</p>`;
-
-  const cv=document.getElementById("cv-eq"); cv.__h=320; cv.style.height="320px";
+    <p class="muted small">Kết quả quá khứ không bảo đảm tương lai.</p>`;
+  const cv=document.getElementById("cv-eq");cv.__h=300;cv.style.height="300px";
   CH.render(cv,{dates:e.dates,
-    series:[{data:bh,color:CO.muted,width:1.3,name:"Mua & giữ"},{data:norm,color:CO.accent,width:1.8,name:"Chiến lược"}],
-    yfmt:v=>Math.round(v), xfmt:d=>d.slice(0,4)});
-  CH.attachHover(cv, document.getElementById("ro-eq"));
+    series:[{data:bh_,color:CO.muted,width:1.3,name:"Mua & giữ"},{data:norm,color:CO.accent,width:1.8,name:"CL"}],
+    yfmt:v=>Math.round(v),xfmt:d=>d.slice(0,4)});
+  CH.attachHover(cv,document.getElementById("ro-eq"));
 }
-function metric(label,val,cls){return `<div class="metric ${cls||""}"><div class="m-l">${label}</div><div class="m-v mono">${val}</div></div>`;}
+function metric(l,v,cls){return`<div class="metric ${cls||""}"><div class="m-l">${l}</div><div class="m-v mono">${v}</div></div>`;}
 
 /* ============ 4) SỰ KIỆN ============ */
-let evScope="INDEX";
-function renderEvents() {
+function renderEvents(){
   const idx=E.indexSeries();
-  const idxE={dates:idx.dates,open:idx.close,high:idx.close,low:idx.close,close:idx.close,volume:idx.close.map(()=>0)};
-  let series,moves,title;
-  if(evScope==="INDEX"){series=idx.close;moves=E.detectBigMoves(idxE,null,0.04);title="VN-Index";}
-  else{const a=analyze(evScope);series=a.e.close;moves=E.detectBigMoves(a.e,evScope,0.05);title=evScope;}
-  const evs=E.eventsFor(evScope==="INDEX"?null:evScope);
+  const evs=E.EVENTS;
   const dpos={};idx.dates.forEach((d,i)=>dpos[d]=i);
   const markers=evs.map(ev=>{
     let i=dpos[ev.date];
     if(i==null){const t=new Date(ev.date).getTime();let best=0,g=1e15;idx.dates.forEach((d,j)=>{const gg=Math.abs(new Date(d)-t);if(gg<g){g=gg;best=j;}});i=best;}
     return{i,color:ev.dir==="up"?CO.buy:CO.sell};
   });
-  const opts=`<option value="INDEX">VN-Index (toàn thị trường)</option>`+
-    Object.keys(E.UNIVERSE).map(s=>`<option value="${s}" ${s===evScope?"selected":""}>${s} — ${E.UNIVERSE[s].name}</option>`).join("");
-  const moveRows=moves.slice().reverse().slice(0,40).map(mv=>`<tr>
-    <td class="mono">${mv.date}</td>
-    <td class="mono" style="color:${mv.ret>=0?CO.buy:CO.sell}">${mv.ret>=0?"+":""}${(mv.ret*100).toFixed(2)}%</td>
-    <td>${mv.event?`<span class="sev ${mv.event.sev}">${mv.event.title}</span>`:"<span class='muted'>— chưa khớp —</span>"}</td>
-    <td class="t-reason">${mv.event?mv.event.note:""}</td>
-  </tr>`).join("");
-
-  document.getElementById("view-events").innerHTML=`
-    <div class="row-between">
-      <div><h2>Sự kiện &amp; biến động mạnh</h2>
-      <p class="muted">Tự dò phiên biến động ≥4% và khớp sự kiện gần nhất (±5 ngày).</p></div>
-      <select class="sel" onchange="APP.pickEv(this.value)">${opts}</select>
-    </div>
-    <div class="card">
-      <div class="muted">${title} 2014 → ${ASOF} · <span style="color:${CO.sell}">●</span> sự kiện tiêu cực · <span style="color:${CO.buy}">●</span> tích cực</div>
-      <canvas id="cv-idx"></canvas><div class="readout" id="ro-idx"></div>
-    </div>
-    <div class="card">
-      <table class="grid"><thead><tr><th>Ngày</th><th>Biến động</th><th>Sự kiện</th><th>Diễn giải</th></tr></thead>
-      <tbody>${moveRows}</tbody></table>
-    </div>`;
-
-  const cv=document.getElementById("cv-idx"); cv.__h=320; cv.style.height="320px";
   const evByPos={};markers.forEach((m,k)=>evByPos[m.i]=evs[k]);
-  CH.render(cv,{dates:idx.dates,
-    series:[{data:series,color:CO.line,width:1.6,name:title}],
-    markers, yfmt:v=>CH.niceFmt(v), xfmt:d=>d.slice(0,4),
-    onHover:(i)=>{const ev=evByPos[i];return ev?`<span style="color:${ev.dir==="up"?CO.buy:CO.sell}">● ${ev.title}</span>`:"";}
+  const rows=evs.slice().reverse().map(ev=>`<tr>
+    <td class="mono">${ev.date}</td>
+    <td><span class="sev ${ev.sev}">${ev.title}</span></td>
+    <td class="t-reason">${ev.note}</td>
+  </tr>`).join("");
+  document.getElementById("view-events").innerHTML=`
+    <h2 style="margin-bottom:6px">Sự kiện lớn 2018→${ASOF}</h2>
+    <p class="muted" style="margin-bottom:14px">Điểm trên biểu đồ: <span style="color:${CO.sell}">●</span> tiêu cực · <span style="color:${CO.buy}">●</span> tích cực</p>
+    <div class="card">
+      <canvas id="cv-idx" style="height:320px"></canvas><div class="readout" id="ro-idx"></div>
+    </div>
+    <div class="card">
+      <table class="grid"><thead><tr><th>Ngày</th><th>Sự kiện</th><th>Diễn giải</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+    </div>`;
+  const cv=document.getElementById("cv-idx");cv.__h=320;cv.style.height="320px";
+  CH.render(cv,{dates:idx.dates,series:[{data:idx.close,color:CO.line,width:1.6,name:"VN-Index"}],
+    markers,yfmt:v=>CH.niceFmt(v),xfmt:d=>d.slice(0,4),
+    onHover:i=>{const ev=evByPos[i];return ev?`<span style="color:${ev.dir==="up"?CO.buy:CO.sell}">● ${ev.title}</span>`:"";},
   });
-  CH.attachHover(cv, document.getElementById("ro-idx"));
+  CH.attachHover(cv,document.getElementById("ro-idx"));
 }
 
 /* ============ ĐIỀU HƯỚNG ============ */
-function switchTab(tab) {
+function switchTab(tab){
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("show",v.id==="view-"+tab));
   if(tab==="table")    renderTable();
@@ -1185,34 +785,29 @@ function switchTab(tab) {
   if(tab==="events")   renderEvents();
 }
 
-window.APP = {
-  init() {
-    const badge=document.getElementById("data-badge"), foot=document.getElementById("data-foot-text");
+window.APP={
+  init(){
+    const badge=document.getElementById("data-badge"),foot=document.getElementById("data-foot-text");
     if(E.isReal&&badge){
-      badge.textContent="● Dữ liệu thật"; badge.classList.add("real");
-      if(foot) foot.textContent="Dữ liệu HOSE thật, cập nhật tới phiên "+(E.asof||ASOF)+". Công cụ hỗ trợ, không phải khuyến nghị đầu tư.";
+      badge.textContent="● Dữ liệu thật";badge.classList.add("real");
+      if(foot)foot.textContent=`${Object.keys(E.UNIVERSE).length} mã VN100 · lọc ≥${E.liqMin}tỷ/phiên · cập nhật ${E.asof}.`;
     }
+    // Chọn mã đầu tiên có tín hiệu thật
+    const syms=Object.keys(E.UNIVERSE);
+    if(syms.length){curSym=syms[0];btSym=syms[0];}
     document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
     switchTab("table");
   },
-  setFilter(f){tableFilter=f;renderTable();},
-  goDetail(s){
-    curSym=s;
-    document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab==="detail"));
-    document.querySelectorAll(".view").forEach(v=>v.classList.toggle("show",v.id==="view-detail"));
-    renderDetail();
-  },
+  setFilter(f){tFilter=f;renderTable();},
+  setSector(s){tSector=s;renderTable();},
+  setSearch(s){tSearch=s;renderTable();},
+  goDetail(s){curSym=s;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab==="detail"));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("show",v.id==="view-detail"));renderDetail();},
   pick(s){curSym=s;renderDetail();},
   setRange(v){curRange=v;renderDetail();},
   pickBt(s){btSym=s;renderBacktest();},
-  pickEv(s){evScope=s;renderEvents();},
+  pickEv(s){renderEvents();},
 };
-window.addEventListener("resize",()=>{
-  document.querySelectorAll("canvas").forEach(cv=>{
-    if(cv.__cmodel) renderCandle(cv,cv.__cmodel);
-    else if(cv.__model) CH.render(cv,cv.__model);
-  });
-});
+window.addEventListener("resize",()=>{document.querySelectorAll("canvas").forEach(cv=>{if(cv.__cmodel)renderCandle(cv,cv.__cmodel);else if(cv.__model)CH.render(cv,cv.__model);});});
 document.addEventListener("DOMContentLoaded",()=>window.APP.init());
 })();
 
