@@ -3,9 +3,7 @@ name: Cập nhật dữ liệu HOSE hằng ngày
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - "data.js"
-      - "data.json"
+    paths-ignore: ["data.js","data.json","signals.js"]
   schedule:
     - cron: "30 9 * * 1-5"
   workflow_dispatch: {}
@@ -17,28 +15,22 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Lấy mã nguồn
-        uses: actions/checkout@v4
-
-      - name: Cài Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Cài thư viện
-        run: pip install -U vnstock pandas
-
-      - name: Tải dữ liệu mới (sinh data.js)
+        run: pip install -U vnstock pandas numpy
+      - name: Tải dữ liệu VN100 + tính tín hiệu
         run: python fetch_data.py
-
-      - name: Lưu dữ liệu mới vào kho
+      - name: Lưu kết quả
         run: |
           git config user.name "hose-bot"
           git config user.email "hose-bot@users.noreply.github.com"
-          git add data.js data.json
+          git add signals.js data.js data.json
           if git diff --staged --quiet; then
             echo "Không có thay đổi."
           else
-            git commit -m "Cập nhật dữ liệu HOSE: $(date -u +%Y-%m-%d)"
+            git commit -m "Cập nhật VN100: $(date -u +%Y-%m-%d)"
             git push
           fi
