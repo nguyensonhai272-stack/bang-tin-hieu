@@ -33,6 +33,7 @@ table.grid tbody tr{cursor:pointer;transition:.1s}table.grid tbody tr:hover{back
 .badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--disp)}
 .badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}
 .fund-grade-sm{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700}
+.conf-badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;cursor:default;white-space:nowrap}
 /* controls */
 .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:2px}.seg.sm button{font-size:11px;padding:3px 8px}
 .seg button{background:none;border:none;color:var(--muted);padding:5px 11px;border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--body)}.seg button.on{background:var(--accent);color:#06231f;font-weight:600}
@@ -417,6 +418,64 @@ const SIG_VI={BUY:"MUA",SELL:"BÁN",HOLD:"GIỮ"};
 const SIG_CLS={BUY:"buy",SELL:"sell",HOLD:"hold"};
 const ASOF=E.asof||E.indexSeries().dates.at(-1);
 
+/* ── Dữ liệu tin cậy theo ngành ─────────────────────────────
+   Nguồn: WFO(40%)+IC(35%)+GS(25%) trên 44 mã thật HOSE 2018-2026
+   CAO = OOS dương + ≥4 mã đồng thuận
+   TRUNG = OOS dương nhưng ít mã
+   THẤP = OOS âm hoặc 1 mã ─────────────────────────────────── */
+const SECTOR_CONF = {
+  "Ngân hàng":           {conf:"CAO",   color:"#2DBE8B", oos:+0.359, n:15,
+    note:"15 mã đồng thuận. RSI hiệu quả nhất. Tín hiệu đáng tin để ra quyết định."},
+  "Bất động sản":        {conf:"CAO",   color:"#2DBE8B", oos:+0.320, n:10,
+    note:"10 mã. ADX bắt tốt chu kỳ tín dụng BĐS. Tín hiệu đáng tin."},
+  "Chứng khoán":         {conf:"CAO",   color:"#2DBE8B", oos:+0.425, n:4,
+    note:"SSI/VND/HCM/MBS đi theo chu kỳ thị trường rõ nhất. OOS tốt nhất nhóm CAO."},
+  "Năng lượng":          {conf:"TRUNG", color:"#E0A23C", oos:+0.513, n:1,
+    note:"Chỉ có POW. OOS tốt nhưng cần thêm mã (NT2, REE) để xác nhận."},
+  "Công nghệ":           {conf:"TRUNG", color:"#E0A23C", oos:+0.924, n:1,
+    note:"Chỉ có FPT. OOS tốt nhất toàn thị trường nhưng 1 mã dễ overfit."},
+  "Hàng không & Vận tải":{conf:"TRUNG", color:"#E0A23C", oos:+0.037, n:4,
+    note:"OOS gần 0. Bollinger bắt mean-reversion sau cú sốc. Dùng thận trọng."},
+  "Dầu khí":             {conf:"THẤP",  color:"#E5484D", oos:-0.015, n:5,
+    note:"Giá phụ thuộc dầu thế giới nhiều hơn kỹ thuật HOSE. Kết hợp phân tích vĩ mô."},
+  "Thép & Vật liệu":     {conf:"THẤP",  color:"#E5484D", oos:-0.065, n:1,
+    note:"Chỉ có HPG. Cần thêm HSG, NKG, TLH để có trọng số ngành chắc hơn."},
+  "Tiêu dùng":           {conf:"THẤP",  color:"#E5484D", oos:-0.282, n:2,
+    note:"OOS âm. Tín hiệu kỹ thuật kém hiệu quả. Ưu tiên phân tích cơ bản."},
+  "Bán lẻ":              {conf:"THẤP",  color:"#E5484D", oos:-0.132, n:1,
+    note:"Chỉ có MWG. OOS âm. Cần thêm mã và kết hợp dữ liệu bán lẻ ngành."},
+};
+const CONF_DESC = {
+  "CAO":   {label:"● Tin cậy CAO",  bg:"rgba(45,190,139,.12)", border:"rgba(45,190,139,.3)", text:"#2DBE8B",
+            tip:"Trọng số được xác nhận bởi nhiều mã + OOS dương. Tín hiệu đủ tin để tham khảo quyết định đầu tư."},
+  "TRUNG": {label:"◐ Tin cậy TRUNG",bg:"rgba(224,162,60,.12)",  border:"rgba(224,162,60,.3)",  text:"#E0A23C",
+            tip:"OOS dương nhưng ít mã. Dùng tín hiệu như một trong nhiều yếu tố, không nên dùng một mình."},
+  "THẤP":  {label:"○ Tin cậy THẤP", bg:"rgba(229,72,77,.10)",   border:"rgba(229,72,77,.3)",   text:"#E5484D",
+            tip:"OOS âm hoặc 1 mã. Tín hiệu kỹ thuật kém hiệu quả với nhóm này. Cần phân tích cơ bản và vĩ mô bổ sung."},
+};
+
+function getConf(sector){return SECTOR_CONF[sector]||{conf:"TRUNG",color:"#E0A23C",oos:null,n:0,note:"Chưa có dữ liệu đủ cho ngành này."};}
+
+function confBadge(sector, short=false){
+  const c=getConf(sector);
+  const d=CONF_DESC[c.conf]||CONF_DESC["TRUNG"];
+  const lbl=short?(c.conf==="CAO"?"●CAO":c.conf==="TRUNG"?"◐TRUNG":"○THẤP"):d.label;
+  return `<span class="conf-badge" title="${d.tip}" style="background:${d.bg};color:${d.text};border:1px solid ${d.border}">${lbl}</span>`;
+}
+
+function confPanel(sector){
+  const c=getConf(sector);
+  const d=CONF_DESC[c.conf]||CONF_DESC["TRUNG"];
+  return `<div class="conf-panel" style="background:${d.bg};border:1px solid ${d.border};border-radius:8px;padding:12px 14px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-weight:700;color:${d.text};font-size:14px">${d.label}</span>
+      <span style="color:var(--muted);font-size:11px">ngành ${sector} · ${c.n} mã · OOS Sharpe ${c.oos!=null?(c.oos>=0?"+":"")+c.oos.toFixed(3):"N/A"}</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--text)">${c.note}</div>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid ${d.border}">${d.tip}</div>
+  </div>`;
+}
+
 /* ── Cache chi tiết ─────────────────────────────────────── */
 const detailCache={};
 function getDetail(sym){
@@ -567,10 +626,10 @@ function renderTable(){
     <td>${badge(r.signal)}</td>
     <td class="mono">${r.score>=0?"+":""}${r.score.toFixed(3)}</td>
     <td class="mono">${r.rsi||"–"}</td>
+    <td>${confBadge(r.sector, true)}</td>
     <td>${fundBadge(r.grade)}</td>
     <td class="mono">${r.fund.pe?.toFixed(1)||"–"}</td>
-    <td class="mono">${r.fund.roe==null?"–":((r.fund.roe>1?r.fund.roe:r.fund.roe*100).toFixed(1)+"%")}</td>
-    <td class="mono liq">${r.gtgd_bn?.toFixed(0)||"–"} tỷ</td>
+    <td class="mono liq">${r.gtgd_bn?.toFixed(0)||"–"}tỷ</td>
   </tr>`).join("");
 
   document.getElementById("view-table").innerHTML=`
@@ -591,7 +650,7 @@ function renderTable(){
     <div class="card" style="padding:0;overflow:hidden">
       <table class="grid">
         <thead><tr><th>Mã</th><th>Ngành</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
-          <th>Điểm</th><th>RSI</th><th>Cơ bản</th><th>P/E</th><th>ROE</th><th>GTGD</th></tr></thead>
+          <th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản</th><th>P/E</th><th>GTGD</th></tr></thead>
         <tbody>${body||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
       </table>
     </div>
@@ -619,6 +678,9 @@ function renderDetail(){
       <h2>Phân tích mã</h2>
       <select class="sel" onchange="APP.pick(this.value)">${opts}</select>
     </div>
+
+    ${confPanel(E.UNIVERSE[curSym]?.sector||"")}
+
     <div class="grid3">
       <div class="card verdict ${SIG_CLS[signalVal]}">
         <div class="muted">Tín hiệu tổng hợp — ${ASOF}</div>
