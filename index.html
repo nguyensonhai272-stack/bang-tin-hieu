@@ -255,11 +255,11 @@ const ACTIVE_FUND   = IS_REAL?(_SIG.fundamentals||{}): {};
 const ACTIVE_NEWS   = IS_REAL?(_SIG.news||{}): {};
 
 /* Thứ tự ngành hiển thị (từ lớn đến nhỏ theo tổng vốn hóa) */
-const SECTOR_ORDER = ["Ngân hàng","Bất động sản","Công nghệ","Dầu khí","Chứng khoán",
+window.SECTOR_ORDER = ["Ngân hàng","Bất động sản","Công nghệ","Dầu khí","Chứng khoán",
                       "Thép & Vật liệu","Tiêu dùng","Bán lẻ","Hàng không","Vận tải","Năng lượng","Khác"];
 
 /* Vốn hóa ước tính (tỷ đồng) — dùng để sắp xếp trong ngành, cập nhật 06/2026 */
-const MARKET_CAP = {
+window.MARKET_CAP = {
   // Ngân hàng
   VCB:460000, BID:290000, CTG:230000, MBB:180000, TCB:170000,
   ACB:120000, VPB:115000, STB:110000, HDB:95000,  LPB:85000,
@@ -649,8 +649,8 @@ function renderTable(){
 
   // Lấy danh sách ngành theo thứ tự đã định
   const sectorSet=new Set(Object.values(uni).map(u=>u.sector||"").filter(Boolean));
-  const sectors=[...SECTOR_ORDER.filter(s=>sectorSet.has(s)),
-                 ...[...sectorSet].filter(s=>!SECTOR_ORDER.includes(s)).sort()];
+  const sectors=[...window.SECTOR_ORDER.filter(s=>sectorSet.has(s)),
+                 ...[...sectorSet].filter(s=>!window.SECTOR_ORDER.includes(s)).sort()];
 
   let rows=syms.map(sym=>{
     const s=allSigs[sym];
@@ -659,7 +659,7 @@ function renderTable(){
     const grade=E.fundGrade(fundScore);
     return{sym,name:uni[sym]?.name||sym,sector:uni[sym]?.sector||"Khác",
       ...s,fundScore,grade,fund,news:E.getNews(sym),
-      marketCap:MARKET_CAP[sym]||0};
+      marketCap:window.MARKET_CAP[sym]||0};
   });
 
   // Lọc
@@ -669,7 +669,7 @@ function renderTable(){
 
   // Sắp xếp: trong ngành theo vốn hóa giảm dần; nếu lọc ngành đơn thì chỉ sort vốn hóa
   rows.sort((a,b)=>{
-    const si=SECTOR_ORDER.indexOf(a.sector), sj=SECTOR_ORDER.indexOf(b.sector);
+    const si=window.SECTOR_ORDER.indexOf(a.sector), sj=window.SECTOR_ORDER.indexOf(b.sector);
     const secDiff=(si===-1?99:si)-(sj===-1?99:sj);
     if(tSector==="ALL" && secDiff!==0) return secDiff;
     return b.marketCap-a.marketCap;
