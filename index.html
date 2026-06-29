@@ -31,7 +31,7 @@ table.grid tbody tr{cursor:pointer;transition:.1s}table.grid tbody tr:hover{back
 .t-sym{font-family:var(--disp);font-weight:600;font-size:13.5px}.t-name{font-size:10.5px;color:var(--muted)}.t-reason{color:var(--muted);font-size:11.5px}.liq{color:var(--muted) !important}
 .sector-tag{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:10px;color:var(--muted)}
 .badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--disp)}
-.badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}
+.badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}.badge.warn{background:rgba(224,162,60,.20);color:var(--hold);border:1px solid rgba(224,162,60,.45)}
 .fund-grade-sm{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700}
 .conf-badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;cursor:default;white-space:nowrap}
 /* controls */
@@ -250,6 +250,7 @@ function detectBigMoves(e,threshold=0.04){
 const ACTIVE_UNI    = IS_REAL?(_SIG.universe||{}): SYN_UNI;
 const ACTIVE_SIGS   = IS_REAL?(_SIG.signals||{}): {};
 const ACTIVE_FUND   = IS_REAL?(_SIG.fundamentals||{}): {};
+const ACTIVE_NEWS   = IS_REAL?(_SIG.news||{}): {};
 const ACTIVE_STOCKS = (_DATA&&_DATA.stocks)||{};
 
 const ENGINE={
@@ -262,6 +263,7 @@ const ENGINE={
   // Tín hiệu đã tính sẵn server-side (nhanh)
   getSignal: (sym)=>ACTIVE_SIGS[sym]||null,
   getAllSignals: ()=>ACTIVE_SIGS,
+  getNews: (sym)=>ACTIVE_NEWS[sym]||null,
   getFundamental: (sym)=>ACTIVE_FUND[sym]||null,
   scoreFundamental, fundGrade,
 
@@ -489,6 +491,24 @@ const fmtPct=(v,d=1)=>v==null?"–":(v*100).toFixed(d)+"%";
 function badge(sig){return `<span class="badge ${SIG_CLS[sig]}">${SIG_VI[sig]}</span>`;}
 function fundBadge(g){return `<span class="fund-grade-sm" style="background:${g.color}22;color:${g.color};border:1px solid ${g.color}44">${g.grade}</span>`;}
 
+/* ── Tin vĩ mô (Gemini) + phân tích đồng thuận với tín hiệu kỹ thuật ── */
+const SENT_CLS={"TÍCH CỰC":"buy","TIÊU CỰC":"sell","TRUNG LẬP":"hold"};
+const SENT_VI ={"TÍCH CỰC":"Tích cực","TIÊU CỰC":"Tiêu cực","TRUNG LẬP":"Trung lập"};
+function newsBadge(sent){
+  if(!sent) return `<span class="badge hold" style="opacity:.45">—</span>`;
+  return `<span class="badge ${SENT_CLS[sent]||"hold"}">${SENT_VI[sent]||sent}</span>`;
+}
+function confluence(signal, sent){
+  const pos=sent==="TÍCH CỰC", neg=sent==="TIÊU CỰC";
+  if(signal==="BUY" && pos)  return {cls:"buy", label:"Đồng thuận TĂNG", explain:"Tín hiệu kỹ thuật MUA và tin vĩ mô tích cực cùng chiều — độ tin cậy cao."};
+  if(signal==="SELL"&& neg)  return {cls:"sell",label:"Đồng thuận GIẢM", explain:"Tín hiệu kỹ thuật BÁN và tin vĩ mô tiêu cực cùng chiều — rủi ro giảm rõ rệt."};
+  if(signal==="BUY" && neg)  return {cls:"warn",label:"⚠ Phân kỳ",      explain:"Kỹ thuật MUA nhưng tin vĩ mô TIÊU CỰC — thận trọng: tin xấu có thể kéo giá xuống bất chấp tín hiệu kỹ thuật."};
+  if(signal==="SELL"&& pos)  return {cls:"warn",label:"⚠ Phân kỳ",      explain:"Kỹ thuật BÁN nhưng tin vĩ mô TÍCH CỰC — có thể sắp đảo chiều tăng, cân nhắc chưa bán vội."};
+  if(signal==="HOLD"&& pos)  return {cls:"buy", label:"Nghiêng tăng",    explain:"Kỹ thuật trung tính; tin vĩ mô tích cực tạo thiên hướng tăng nhẹ."};
+  if(signal==="HOLD"&& neg)  return {cls:"sell",label:"Nghiêng giảm",    explain:"Kỹ thuật trung tính; tin vĩ mô tiêu cực tạo thiên hướng giảm nhẹ."};
+  return {cls:"hold",label:"Trung lập", explain:"Tin vĩ mô không tạo thiên hướng rõ ràng; chủ yếu dựa vào tín hiệu kỹ thuật."};
+}
+
 /* ── Biểu đồ nến ─────────────────────────────────────────── */
 function renderCandle(canvas,model){
   const W=canvas.clientWidth||700,H=parseInt(canvas.style.height)||340;
@@ -601,7 +621,7 @@ function renderTable(){
     const fundScore=E.scoreFundamental(fund);
     const grade=E.fundGrade(fundScore);
     return{sym,name:uni[sym]?.name||sym,sector:uni[sym]?.sector||"",
-      ...s,fundScore,grade,fund};
+      ...s,fundScore,grade,fund,news:E.getNews(sym)};
   });
 
   // Lọc
@@ -624,6 +644,7 @@ function renderTable(){
     <td class="mono">${fmt0(r.close)}</td>
     <td class="mono" style="color:${(r.chg_pct||0)>=0?CO.buy:CO.sell}">${(r.chg_pct||0)>=0?"+":""}${(r.chg_pct||0).toFixed(2)}%</td>
     <td>${badge(r.signal)}</td>
+    <td>${newsBadge(r.news?.sentiment)}</td>
     <td class="mono">${r.score>=0?"+":""}${r.score.toFixed(3)}</td>
     <td class="mono">${r.rsi||"–"}</td>
     <td>${confBadge(r.sector, true)}</td>
@@ -650,8 +671,8 @@ function renderTable(){
     <div class="card" style="padding:0;overflow:hidden">
       <table class="grid">
         <thead><tr><th>Mã</th><th>Ngành</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
-          <th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản</th><th>P/E</th><th>GTGD</th></tr></thead>
-        <tbody>${body||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
+          <th>Tin vĩ mô</th><th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản</th><th>P/E</th><th>GTGD</th></tr></thead>
+        <tbody>${body||`<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
       </table>
     </div>
     <p class="muted small">Hiển thị ${rows.length}/${syms.length} mã. Nhấp một dòng để xem chi tiết biểu đồ nến & phân tích.</p>`;
@@ -711,6 +732,22 @@ function renderDetail(){
         </div>
       </div>
     </div>
+    ${(()=>{const nw=E.getNews(curSym); if(!nw) return "";
+      const cf=confluence(signalVal, nw.sentiment);
+      return `<div class="card">
+        <div class="row-between" style="margin-bottom:8px">
+          <div class="muted">Tin vĩ mô — phân tích bởi Gemini (cập nhật hằng ngày)</div>
+          ${newsBadge(nw.sentiment)}
+        </div>
+        <p style="line-height:1.6;margin:4px 0 14px;font-size:13.5px">${nw.text}</p>
+        <div style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <span class="badge ${cf.cls}">${cf.label}</span>
+            <span class="muted small">Kỹ thuật ${SIG_VI[signalVal]} × Tin ${SENT_VI[nw.sentiment]||nw.sentiment}</span>
+          </div>
+          <div style="font-size:13px;line-height:1.55">${cf.explain}</div>
+        </div>
+      </div>`;})()}
     <div class="card">
       <div class="row-between">
         <div class="muted">Biểu đồ nến — ${curSym}</div>

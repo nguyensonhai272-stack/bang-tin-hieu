@@ -19,6 +19,10 @@ OUT_SIGNALS     = "signals.js"
 OUT_DATA        = "data.js"
 OUT_JSON        = "data.json"
 
+# URL CSV của Google Sheet tin tức vĩ mô (do Gemini cập nhật mỗi sáng).
+# Hoạt động sau khi bạn chia sẻ Sheet ở chế độ "Bất kỳ ai có đường liên kết → Người xem".
+NEWS_CSV_URL    = "https://docs.google.com/spreadsheets/d/1u8UsZ5kj0TGzmBAD3nkNW2DOIiX84ROxAVz4qxfK1hw/export?format=csv&gid=0"
+
 DELAY          = 65
 REQ_PER_BATCH  = 15
 INTER_DELAY    = 3
@@ -334,6 +338,47 @@ def series(df):
         "volume": [int(v) for v in df["volume"].astype(float)],
     }
 
+# ── Tải tin tức vĩ mô từ Google Sheet (do Gemini cập nhật) ───────────────
+def _deaccent(s):
+    import unicodedata
+    return "".join(c for c in unicodedata.normalize("NFD", s)
+                   if unicodedata.category(c) != "Mn")
+
+def fetch_news():
+    """Đọc Sheet tin tức (CSV) -> {MÃ: {sentiment, text}}.
+    Cột A = mã CK, cột B = phân tích (bắt đầu bằng [TÍCH CỰC]/[TIÊU CỰC]/[TRUNG LẬP]).
+    Lỗi mạng hay chưa publish thì trả {} (dashboard vẫn chạy bình thường)."""
+    news = {}
+    if not NEWS_CSV_URL or "PASTE" in NEWS_CSV_URL:
+        print("  (Chưa cấu hình NEWS_CSV_URL — bỏ qua tin tức)")
+        return news
+    try:
+        import urllib.request, csv, io
+        req = urllib.request.Request(NEWS_CSV_URL,
+                                     headers={"User-Agent": "Mozilla/5.0"})
+        raw = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
+        rows = list(csv.reader(io.StringIO(raw)))
+        for r in rows[1:]:                      # bỏ dòng tiêu đề
+            if len(r) < 2:
+                continue
+            tk  = r[0].strip().upper()
+            txt = r[1].strip()
+            if not tk or not txt:
+                continue
+            low = txt.lower()
+            # bỏ các ô đang lỗi / đang chạy dở
+            if low.startswith("loi") or low.startswith("lỗi") or "dang phan tich" in low or "đang phân tích" in low:
+                continue
+            head = _deaccent(txt[:50]).upper()
+            if   "TICH CUC" in head: sentiment = "TÍCH CỰC"
+            elif "TIEU CUC" in head: sentiment = "TIÊU CỰC"
+            else:                    sentiment = "TRUNG LẬP"
+            news[tk] = {"sentiment": sentiment, "text": txt}
+        print(f"  Tải tin tức vĩ mô: {len(news)} mã có tin")
+    except Exception as e:
+        print(f"  Lỗi tải tin tức ({e}) — bỏ qua, dashboard vẫn chạy")
+    return news
+
 # ── MAIN ─────────────────────────────────────────────────────────────────
 def main():
     end = dt.date.today().isoformat()
@@ -341,6 +386,8 @@ def main():
 
     syms = fetch_vn100_list()
     print(f"  Danh sách: {len(syms)} mã\n")
+
+    news = fetch_news()        # tin tức vĩ mô từ Google Sheet (Gemini)
 
     signals, stocks, fundamentals, universe = {}, {}, {}, {}
     ok_price = 0
@@ -408,7 +455,7 @@ def main():
     sig_payload = json.dumps(
         {"asof": end, "liq_min": LIQ_MIN_BILLION,
          "signals": signals, "universe": universe,
-         "fundamentals": fundamentals},
+         "fundamentals": fundamentals, "news": news},
         ensure_ascii=False, separators=(",",":"))
     with open(OUT_SIGNALS,"w",encoding="utf-8") as f:
         f.write("window.HOSE_SIGNALS = " + sig_payload + ";\n")
@@ -417,7 +464,7 @@ def main():
     data_payload = json.dumps(
         {"asof": end, "universe": universe,
          "stocks": stocks, "fundamentals": fundamentals,
-         "signals": signals},
+         "signals": signals, "news": news},
         ensure_ascii=False, separators=(",",":"))
     with open(OUT_DATA,"w",encoding="utf-8") as f:
         f.write("window.HOSE_DATA = " + data_payload + ";\n")
