@@ -30,6 +30,8 @@ table.grid td{padding:9px 10px;border-bottom:1px solid var(--border)}
 table.grid tbody tr{cursor:pointer;transition:.1s}table.grid tbody tr:hover{background:var(--panel2)}
 .t-sym{font-family:var(--disp);font-weight:600;font-size:13.5px}.t-name{font-size:10.5px;color:var(--muted)}.t-reason{color:var(--muted);font-size:11.5px}.liq{color:var(--muted) !important}
 .sector-tag{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:10px;color:var(--muted)}
+.sector-header-row td{cursor:default!important}
+.sector-header-row:hover td{background:var(--panel2)!important}
 .badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--disp)}
 .badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}.badge.warn{background:rgba(224,162,60,.20);color:var(--hold);border:1px solid rgba(224,162,60,.45)}
 .fund-grade-sm{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700}
@@ -251,6 +253,39 @@ const ACTIVE_UNI    = IS_REAL?(_SIG.universe||{}): SYN_UNI;
 const ACTIVE_SIGS   = IS_REAL?(_SIG.signals||{}): {};
 const ACTIVE_FUND   = IS_REAL?(_SIG.fundamentals||{}): {};
 const ACTIVE_NEWS   = IS_REAL?(_SIG.news||{}): {};
+
+/* Thứ tự ngành hiển thị (từ lớn đến nhỏ theo tổng vốn hóa) */
+const SECTOR_ORDER = ["Ngân hàng","Bất động sản","Công nghệ","Dầu khí","Chứng khoán",
+                      "Thép & Vật liệu","Tiêu dùng","Bán lẻ","Hàng không","Vận tải","Năng lượng","Khác"];
+
+/* Vốn hóa ước tính (tỷ đồng) — dùng để sắp xếp trong ngành, cập nhật 06/2026 */
+const MARKET_CAP = {
+  // Ngân hàng
+  VCB:460000, BID:290000, CTG:230000, MBB:180000, TCB:170000,
+  ACB:120000, VPB:115000, STB:110000, HDB:95000,  LPB:85000,
+  SHB:75000,  VIB:70000,  TPB:68000,  MSB:62000,  OCB:55000,
+  // Bất động sản
+  VIC:380000, VHM:280000, VRE:75000,  NVL:50000,  KDH:42000,
+  PDR:38000,  DXG:32000,  NLG:28000,  CII:25000,  DIG:22000, VPI:18000,
+  // Công nghệ
+  FPT:205000,
+  // Dầu khí
+  GAS:145000, PLX:75000,  BSR:52000,  PVD:48000,  PVS:42000,
+  // Chứng khoán
+  SSI:58000,  VND:42000,  HCM:35000,  MBS:28000,
+  // Thép & Vật liệu
+  HPG:140000,
+  // Tiêu dùng
+  VNM:120000, MSN:90000,
+  // Bán lẻ
+  MWG:115000,
+  // Hàng không
+  VJC:95000,
+  // Vận tải
+  GMD:38000,  VSC:22000,
+  // Năng lượng
+  POW:42000,
+};
 const ACTIVE_STOCKS = (_DATA&&_DATA.stocks)||{};
 
 const ENGINE={
@@ -612,23 +647,33 @@ function renderTable(){
   const syms=Object.keys(allSigs);
   const uni=E.UNIVERSE;
 
-  // Lấy danh sách ngành
-  const sectors=[...new Set(Object.values(uni).map(u=>u.sector||"").filter(Boolean))].sort();
+  // Lấy danh sách ngành theo thứ tự đã định
+  const sectorSet=new Set(Object.values(uni).map(u=>u.sector||"").filter(Boolean));
+  const sectors=[...SECTOR_ORDER.filter(s=>sectorSet.has(s)),
+                 ...[...sectorSet].filter(s=>!SECTOR_ORDER.includes(s)).sort()];
 
   let rows=syms.map(sym=>{
     const s=allSigs[sym];
     const fund=E.getFundamental(sym)||{};
     const fundScore=E.scoreFundamental(fund);
     const grade=E.fundGrade(fundScore);
-    return{sym,name:uni[sym]?.name||sym,sector:uni[sym]?.sector||"",
-      ...s,fundScore,grade,fund,news:E.getNews(sym)};
+    return{sym,name:uni[sym]?.name||sym,sector:uni[sym]?.sector||"Khác",
+      ...s,fundScore,grade,fund,news:E.getNews(sym),
+      marketCap:MARKET_CAP[sym]||0};
   });
 
   // Lọc
   if(tFilter!=="ALL") rows=rows.filter(r=>r.signal===tFilter);
   if(tSector!=="ALL") rows=rows.filter(r=>r.sector===tSector);
   if(tSearch) rows=rows.filter(r=>r.sym.includes(tSearch.toUpperCase())||r.name.includes(tSearch));
-  rows.sort((a,b)=>Math.abs(b.score)-Math.abs(a.score));
+
+  // Sắp xếp: trong ngành theo vốn hóa giảm dần; nếu lọc ngành đơn thì chỉ sort vốn hóa
+  rows.sort((a,b)=>{
+    const si=SECTOR_ORDER.indexOf(a.sector), sj=SECTOR_ORDER.indexOf(b.sector);
+    const secDiff=(si===-1?99:si)-(sj===-1?99:sj);
+    if(tSector==="ALL" && secDiff!==0) return secDiff;
+    return b.marketCap-a.marketCap;
+  });
 
   const nBuy=rows.filter(r=>r.signal==="BUY").length;
   const nSell=rows.filter(r=>r.signal==="SELL").length;
@@ -638,9 +683,26 @@ function renderTable(){
   const sectorOpts=`<option value="ALL">Tất cả ngành</option>`+
     sectors.map(s=>`<option value="${s}" ${s===tSector?"selected":""}>${s}</option>`).join("");
 
-  const body=rows.map(r=>`<tr onclick="APP.goDetail('${r.sym}')">
+  // Dựng body: chèn header ngành khi chuyển nhóm (chỉ khi hiển thị tất cả ngành)
+  let body="", curSec="";
+  for(const r of rows){
+    if(tSector==="ALL" && r.sector!==curSec){
+      curSec=r.sector;
+      const secRows=rows.filter(x=>x.sector===curSec);
+      const secBuy=secRows.filter(x=>x.signal==="BUY").length;
+      const secSell=secRows.filter(x=>x.signal==="SELL").length;
+      body+=`<tr class="sector-header-row">
+        <td colspan="11" style="background:var(--panel2);padding:6px 12px;font-weight:600;font-size:12px;color:var(--accent);border-top:2px solid var(--border)">
+          ${curSec}
+          <span style="font-weight:400;color:var(--muted);margin-left:8px">${secRows.length} mã</span>
+          ${secBuy?`<span class="badge buy" style="margin-left:6px;font-size:10px">${secBuy} MUA</span>`:""}
+          ${secSell?`<span class="badge sell" style="margin-left:4px;font-size:10px">${secSell} BÁN</span>`:""}
+          ${confBadge(curSec,true)}
+        </td>
+      </tr>`;
+    }
+    body+=`<tr onclick="APP.goDetail('${r.sym}')">
     <td><div class="t-sym">${r.sym}</div><div class="t-name">${r.name}</div></td>
-    <td><span class="sector-tag">${r.sector||"—"}</span></td>
     <td class="mono">${fmt0(r.close)}</td>
     <td class="mono" style="color:${(r.chg_pct||0)>=0?CO.buy:CO.sell}">${(r.chg_pct||0)>=0?"+":""}${(r.chg_pct||0).toFixed(2)}%</td>
     <td>${badge(r.signal)}</td>
@@ -651,7 +713,8 @@ function renderTable(){
     <td>${fundBadge(r.grade)}</td>
     <td class="mono">${r.fund.pe?.toFixed(1)||"–"}</td>
     <td class="mono liq">${r.gtgd_bn?.toFixed(0)||"–"}tỷ</td>
-  </tr>`).join("");
+  </tr>`;
+  }
 
   document.getElementById("view-table").innerHTML=`
     <div class="row-between" style="margin-bottom:10px">
@@ -670,9 +733,9 @@ function renderTable(){
     </div>
     <div class="card" style="padding:0;overflow:hidden">
       <table class="grid">
-        <thead><tr><th>Mã</th><th>Ngành</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
+        <thead><tr><th>Mã</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
           <th>Tin vĩ mô</th><th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản</th><th>P/E</th><th>GTGD</th></tr></thead>
-        <tbody>${body||`<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
+        <tbody>${body||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
       </table>
     </div>
     <p class="muted small">Hiển thị ${rows.length}/${syms.length} mã. Nhấp một dòng để xem chi tiết biểu đồ nến & phân tích.</p>`;
