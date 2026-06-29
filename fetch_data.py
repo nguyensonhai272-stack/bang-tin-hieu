@@ -77,6 +77,13 @@ SECTOR_MAP = {
     "POW":"Năng lượng","NT2":"Năng lượng","GEG":"Năng lượng",
     "REE":"Năng lượng","PPC":"Năng lượng","VSH":"Năng lượng",
     "BVH":"Bảo hiểm","PVI":"Bảo hiểm","BMI":"Bảo hiểm",
+    # Mã mới thêm 06/2026
+    "EIB":"Ngân hàng","SSB":"Ngân hàng",
+    "BCM":"Bất động sản","VPL":"Bất động sản",
+    "GVR":"Cao su & Nông nghiệp",
+    "SAB":"Tiêu dùng","DGC":"Hoá chất",
+    "PNJ":"Bán lẻ trang sức",
+    "GEX":"Điện & Vật liệu điện","GEL":"Điện & Vật liệu điện","GEE":"Điện & Vật liệu điện",
 }
 NAME_MAP = {
     "VCB":"Vietcombank","BID":"BIDV","CTG":"VietinBank","MBB":"MB Bank",
@@ -92,6 +99,10 @@ NAME_MAP = {
     "VNM":"Vinamilk","MWG":"Thế Giới Di Động","MSN":"Masan","SAB":"Sabeco",
     "HVN":"Vietnam Airlines","VJC":"Vietjet","ACV":"Sân bay ACV",
     "GMD":"Gemadept","POW":"PV Power","REE":"REE Corp","BVH":"Bảo Việt",
+    # Mã mới thêm 06/2026
+    "EIB":"Eximbank","SSB":"SeABank","BCM":"Becamex IDC","VPL":"Vinpearl",
+    "GVR":"Cao su Việt Nam","SAB":"Sabeco","DGC":"Hoá chất Đức Giang",
+    "PNJ":"PNJ","GEX":"Gelex","GEL":"GEL","GEE":"GEE",
 }
 FALLBACK_FUND = {
     "VCB":{"pe":13.2,"pb":2.8,"roe":0.195,"roa":0.016,"eps":6820,"eps_growth":0.12},
@@ -122,6 +133,18 @@ FALLBACK_FUND = {
     "VNM":{"pe":17.2,"pb":3.6,"roe":0.208,"roa":0.148,"eps":4280,"eps_growth":0.05},
     "SAB":{"pe":22.4,"pb":4.2,"roe":0.188,"roa":0.142,"eps":7840,"eps_growth":0.03},
     "POW":{"pe":12.6,"pb":1.1,"roe":0.088,"roa":0.042,"eps":1240,"eps_growth":0.06},
+    # Mã mới thêm 06/2026
+    "EIB":{"pe":14.2,"pb":1.3,"roe":0.092,"roa":0.008,"eps":2100,"eps_growth":0.15},
+    "SSB":{"pe":9.8, "pb":1.2,"roe":0.124,"roa":0.011,"eps":2850,"eps_growth":0.18},
+    "BCM":{"pe":22.5,"pb":2.1,"roe":0.094,"roa":0.038,"eps":3200,"eps_growth":0.08},
+    "VPL":{"pe":28.0,"pb":3.2,"roe":0.115,"roa":0.042,"eps":4800,"eps_growth":0.22},
+    "GVR":{"pe":18.5,"pb":1.4,"roe":0.076,"roa":0.038,"eps":1850,"eps_growth":0.06},
+    "SAB":{"pe":24.0,"pb":5.2,"roe":0.218,"roa":0.142,"eps":11200,"eps_growth":0.08},
+    "DGC":{"pe":12.8,"pb":2.4,"roe":0.188,"roa":0.112,"eps":8500,"eps_growth":0.12},
+    "PNJ":{"pe":16.5,"pb":3.8,"roe":0.232,"roa":0.118,"eps":6200,"eps_growth":0.15},
+    "GEX":{"pe":18.0,"pb":1.6,"roe":0.089,"roa":0.032,"eps":1650,"eps_growth":0.10},
+    "GEL":{},
+    "GEE":{},
     "REE":{"pe":9.8, "pb":1.4,"roe":0.142,"roa":0.082,"eps":5280,"eps_growth":0.08},
     "BVH":{"pe":18.4,"pb":1.8,"roe":0.098,"roa":0.012,"eps":3420,"eps_growth":0.07},
     "HVN":{"pe":35.6,"pb":3.2,"roe":0.088,"roa":0.018,"eps":1840,"eps_growth":2.40},
@@ -405,6 +428,18 @@ def fetch_news():
         "VSC": ("TIÊU CỰC", "[TIÊU CỰC] VSC nhận tín hiệu BÁN với ADX >33 xác nhận xu hướng giảm. Thị trường vận tải container nội địa cạnh tranh gay gắt. Doanh nghiệp đang tái cơ cấu đội tàu và tối ưu chi phí khai thác."),
         # Năng lượng
         "POW": ("TÍCH CỰC", "[TÍCH CỰC] PV Power tăng 2,07% trong tuần với điểm tổng hợp dương cao nhất nhóm năng lượng (+0,226). Nhu cầu điện mùa hè tăng mạnh và giá điện được điều chỉnh tăng hỗ trợ doanh thu. RSI 65 cho thấy đà tăng đang duy trì."),
+        # Mã mới thêm 06/2026
+        "EIB": ("TRUNG LẬP", "[TRUNG LẬP] Eximbank đang trong quá trình củng cố quản trị sau giai đoạn biến động lãnh đạo. Hưởng lợi từ Thông tư 25/2026 nhưng quy mô tín dụng còn hạn chế so với nhóm ngân hàng lớn. Kết quả kinh doanh Q2/2026 cần theo dõi thêm để xác nhận đà phục hồi."),
+        "SSB": ("TÍCH CỰC", "[TÍCH CỰC] SeABank (SSB) là thành phần VN30 với tăng trưởng tín dụng duy trì ổn định. Hưởng lợi từ Thông tư 25/2026 và nhu cầu vốn trung-dài hạn tăng. Định giá P/B ~1,2x ở mức hấp dẫn so với ROE ~12,4%."),
+        "BCM": ("TRUNG LẬP", "[TRUNG LẬP] Becamex IDC (BCM) hưởng lợi từ làn sóng FDI vào khu công nghiệp Bình Dương. Tuy nhiên tỷ lệ free-float thấp hạn chế thanh khoản và là lý do BCM bị loại khỏi VN30 trong kỳ tháng 1/2026. Dài hạn vẫn là mã có nền tảng tốt từ quỹ đất khu công nghiệp."),
+        "VPL": ("TÍCH CỰC", "[TÍCH CỰC] Vinpearl (VPL) vừa gia nhập VN30 từ tháng 2/2026 với vốn hóa lọt Top 20 thị trường. Du lịch hè 2026 bùng nổ hỗ trợ trực tiếp doanh thu mảng nghỉ dưỡng và vui chơi giải trí. Cổ phiếu còn non trẻ trên sàn nhưng được kỳ vọng tăng trưởng mạnh nhờ hệ sinh thái Vingroup."),
+        "GVR": ("TRUNG LẬP", "[TRUNG LẬP] Cao su Việt Nam (GVR) được hưởng lợi từ giá cao su tự nhiên phục hồi nhẹ trong Q2/2026. Tuy nhiên biên lợi nhuận mỏng và phụ thuộc lớn vào giá cao su thế giới tạo rủi ro doanh thu. Quỹ đất cao su chuyển đổi sang khu công nghiệp là điểm sáng dài hạn."),
+        "SAB": ("TRUNG LẬP", "[TRUNG LẬP] Sabeco (SAB) ghi nhận doanh thu phục hồi trong mùa hè nhờ tiêu dùng nội địa cải thiện. Tuy nhiên cạnh tranh từ bia nhập khẩu và thói quen tiêu dùng thay đổi tạo áp lực. P/E 24x ở mức cao trong ngành đồ uống."),
+        "DGC": ("TÍCH CỰC", "[TÍCH CỰC] Hoá chất Đức Giang (DGC) hưởng lợi từ nhu cầu phốt pho vàng và các sản phẩm hoá chất cao cấp tăng mạnh từ thị trường xuất khẩu. EPS tăng trưởng mạnh nhờ giá bán cải thiện. MBS dự báo là ứng cử viên tái gia nhập VN30 trong kỳ tháng 7/2026."),
+        "PNJ": ("TÍCH CỰC", "[TÍCH CỰC] PNJ hưởng lợi từ sức mua trang sức phục hồi trong dịp lễ và mùa cưới Q2/2026. ROE ~23% thuộc nhóm cao nhất ngành bán lẻ. Chuỗi cửa hàng mở rộng liên tục và mảng kinh doanh vàng hưởng lợi từ giá vàng tăng cao."),
+        "GEX": ("TÍCH CỰC", "[TÍCH CỰC] Gelex (GEX) hưởng lợi từ nhu cầu thiết bị điện và vật liệu điện tăng mạnh phục vụ các dự án hạ tầng trọng điểm quốc gia và điện mặt trời. Thông tư 25/2026 hỗ trợ gián tiếp qua việc đẩy nhanh giải ngân vốn cho các dự án năng lượng."),
+        "GEL": ("TRUNG LẬP", "[TRUNG LẬP] GEL trong giai đoạn tích lũy với thanh khoản còn hạn chế. Hoạt động trong mảng năng lượng tái tạo hưởng lợi từ xu hướng chuyển đổi xanh dài hạn. Cần thêm thời gian để xác nhận đà tăng bền vững."),
+        "GEE": ("TRUNG LẬP", "[TRUNG LẬP] GEE là mã trong hệ sinh thái Gelex với hoạt động trong lĩnh vực điện. Hưởng lợi từ nhu cầu điện mùa hè và các dự án hạ tầng điện. Thanh khoản cần cải thiện để thu hút dòng tiền tổ chức."),
     }
 
     news = {}

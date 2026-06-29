@@ -256,7 +256,9 @@ const ACTIVE_NEWS   = IS_REAL?(_SIG.news||{}): {};
 
 /* Thứ tự ngành hiển thị (từ lớn đến nhỏ theo tổng vốn hóa) */
 window.SECTOR_ORDER = ["Ngân hàng","Bất động sản","Công nghệ","Dầu khí","Chứng khoán",
-                      "Thép & Vật liệu","Tiêu dùng","Bán lẻ","Hàng không","Vận tải","Năng lượng","Khác"];
+                      "Thép & Vật liệu","Tiêu dùng","Bán lẻ","Bán lẻ trang sức","Hàng không",
+                      "Cao su & Nông nghiệp","Hoá chất","Điện & Vật liệu điện",
+                      "Vận tải","Năng lượng","Khác"];
 
 /* Vốn hóa ước tính (tỷ đồng) — dùng để sắp xếp trong ngành, cập nhật 06/2026 */
 window.MARKET_CAP = {
@@ -285,6 +287,13 @@ window.MARKET_CAP = {
   GMD:38000,  VSC:22000,
   // Năng lượng
   POW:42000,
+  // Mã mới thêm 06/2026
+  EIB:38000, SSB:55000,                          // Ngân hàng
+  BCM:90000, VPL:130000,                          // Bất động sản
+  GVR:48000,                                       // Cao su & Nông nghiệp
+  SAB:85000, DGC:62000,                           // Tiêu dùng / Hoá chất
+  PNJ:52000,                                       // Bán lẻ trang sức
+  GEX:32000, GEL:8000, GEE:6000,                 // Điện & Vật liệu điện
 };
 const ACTIVE_STOCKS = (_DATA&&_DATA.stocks)||{};
 
