@@ -51,6 +51,8 @@ VN100_FALLBACK = [
     "POW","NT2","GEG","REE","PPC","VSH","SHP","CHP","TMP","TBC",
     # Bảo hiểm & Đầu tư
     "BVH","PVI","BMI","ABI","MIG","PTI","VNR","BIC","PRE","PGI",
+    # Mã mới thêm 06/2026 (VN30 mới + theo yêu cầu)
+    "VPL","GVR","DGC","EIB","PNJ","GEX","GEL","GEE",
 ]
 
 SECTOR_MAP = {
@@ -437,9 +439,9 @@ def fetch_news():
         "SAB": ("TRUNG LẬP", "[TRUNG LẬP] Sabeco (SAB) ghi nhận doanh thu phục hồi trong mùa hè nhờ tiêu dùng nội địa cải thiện. Tuy nhiên cạnh tranh từ bia nhập khẩu và thói quen tiêu dùng thay đổi tạo áp lực. P/E 24x ở mức cao trong ngành đồ uống."),
         "DGC": ("TÍCH CỰC", "[TÍCH CỰC] Hoá chất Đức Giang (DGC) hưởng lợi từ nhu cầu phốt pho vàng và các sản phẩm hoá chất cao cấp tăng mạnh từ thị trường xuất khẩu. EPS tăng trưởng mạnh nhờ giá bán cải thiện. MBS dự báo là ứng cử viên tái gia nhập VN30 trong kỳ tháng 7/2026."),
         "PNJ": ("TÍCH CỰC", "[TÍCH CỰC] PNJ hưởng lợi từ sức mua trang sức phục hồi trong dịp lễ và mùa cưới Q2/2026. ROE ~23% thuộc nhóm cao nhất ngành bán lẻ. Chuỗi cửa hàng mở rộng liên tục và mảng kinh doanh vàng hưởng lợi từ giá vàng tăng cao."),
-        "GEX": ("TÍCH CỰC", "[TÍCH CỰC] Gelex (GEX) hưởng lợi từ nhu cầu thiết bị điện và vật liệu điện tăng mạnh phục vụ các dự án hạ tầng trọng điểm quốc gia và điện mặt trời. Thông tư 25/2026 hỗ trợ gián tiếp qua việc đẩy nhanh giải ngân vốn cho các dự án năng lượng."),
-        "GEL": ("TRUNG LẬP", "[TRUNG LẬP] GEL trong giai đoạn tích lũy với thanh khoản còn hạn chế. Hoạt động trong mảng năng lượng tái tạo hưởng lợi từ xu hướng chuyển đổi xanh dài hạn. Cần thêm thời gian để xác nhận đà tăng bền vững."),
-        "GEE": ("TRUNG LẬP", "[TRUNG LẬP] GEE là mã trong hệ sinh thái Gelex với hoạt động trong lĩnh vực điện. Hưởng lợi từ nhu cầu điện mùa hè và các dự án hạ tầng điện. Thanh khoản cần cải thiện để thu hút dòng tiền tổ chức."),
+        "GEX": ("TÍCH CỰC", "[TÍCH CỰC] Tập đoàn Gelex (GEX) công bố doanh thu Q1/2026 hơn 10.700 tỷ đồng (+35% YoY), lợi nhuận trước thuế khoảng 806 tỷ đồng. Vừa rót hơn 8.000 tỷ đồng vào hạ tầng sân bay Gia Bình qua liên doanh, mở rộng mảng đầu tư hạ tầng. Cổ phiếu đang ở vùng giá cao nhất từ đầu năm sau đợt phát hành cổ phiếu thưởng tỷ lệ 45%."),
+        "GEL": ("TÍCH CỰC", "[TÍCH CỰC] GELEX Hạ tầng (GEL) vừa niêm yết từ 06/02/2026, sở hữu chi phối Viglacera với mảng vật liệu xây dựng và bất động sản khu công nghiệp. Vừa ký hợp tác chiến lược với Frasers Property mở rộng đầu tư bất động sản dân dụng, đồng thời tham gia 20% cổ phần dự án sân bay quốc tế Gia Bình — tạo động lực tăng trưởng dài hạn."),
+        "GEE": ("TÍCH CỰC", "[TÍCH CỰC] GELEX Electric (GEE) vừa hoàn tất phát hành cổ phiếu thưởng tỷ lệ 4:3, tăng vốn điều lệ lên ~6.404 tỷ đồng. Cổ phiếu duy trì xu hướng tăng trung hạn với thanh khoản tốt (~1 triệu cp/phiên). Sở hữu các thương hiệu thiết bị điện đầu ngành như Cadivi, Thibidi, cùng danh mục năng lượng tái tạo (thủy điện, điện mặt trời, điện gió)."),
     }
 
     news = {}
