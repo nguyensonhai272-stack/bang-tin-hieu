@@ -34,6 +34,7 @@ table.grid tbody tr{cursor:pointer;transition:.1s}table.grid tbody tr:hover{back
 .sector-header-row:hover td{background:var(--panel2)!important}
 .badge{display:inline-block;padding:2px 9px;border-radius:5px;font-size:11px;font-weight:600;font-family:var(--disp)}
 .badge.buy{background:rgba(45,190,139,.15);color:var(--buy)}.badge.sell{background:rgba(229,72,77,.15);color:var(--sell)}.badge.hold{background:rgba(224,162,60,.12);color:var(--hold)}.badge.warn{background:rgba(224,162,60,.20);color:var(--hold);border:1px solid rgba(224,162,60,.45)}
+.badge.obos{border:1px dashed;font-weight:600}.badge.obos.ob{background:rgba(229,72,77,.12);color:var(--sell);border-color:rgba(229,72,77,.55)}.badge.obos.os{background:rgba(45,190,139,.12);color:var(--buy);border-color:rgba(45,190,139,.55)}.badge.obos.strong{border-style:solid;font-weight:700}
 .fund-grade-sm{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:700}
 .conf-badge{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10.5px;font-weight:600;cursor:default;white-space:nowrap}
 /* controls */
@@ -74,7 +75,7 @@ canvas{width:100%;display:block;margin:6px 0 4px;cursor:crosshair}
 <div class="app">
   <aside class="side">
     <div><div class="brand">HOSE Signal<span class="dot">.</span></div>
-    <div class="brand-sub">VN100 · Kỹ thuật + Cơ bản</div></div>
+    <div class="brand-sub">VN100 · Tín hiệu 100% kỹ thuật · Cơ bản chỉ tham khảo</div></div>
     <nav class="nav">
       <button data-tab="table"    class="on"><span class="ic"></span>Bảng tín hiệu</button>
       <button data-tab="detail"          ><span class="ic"></span>Phân tích mã</button>
@@ -303,6 +304,7 @@ const ENGINE={
   isReal: IS_REAL,
   asof: IS_REAL?(_SIG.asof||null):null,
   liqMin: IS_REAL?(_SIG.liq_min||50):0,
+  market: IS_REAL?(_SIG.market||null):null,
 
   // Tín hiệu đã tính sẵn server-side (nhanh)
   getSignal: (sym)=>ACTIVE_SIGS[sym]||null,
@@ -535,6 +537,38 @@ const fmtPct=(v,d=1)=>v==null?"–":(v*100).toFixed(d)+"%";
 function badge(sig){return `<span class="badge ${SIG_CLS[sig]}">${SIG_VI[sig]}</span>`;}
 function fundBadge(g){return `<span class="fund-grade-sm" style="background:${g.color}22;color:${g.color};border:1px solid ${g.color}44">${g.grade}</span>`;}
 
+/* ── Trạng thái Quá mua / Quá bán (RSI + Stoch %K + BB %B) — chỉ cảnh báo, không vào điểm.
+   Quy tắc chống nhiễu: cần RSI xác nhận (≥70/≤30) HOẶC ≥2/3 chỉ báo đồng thuận. ── */
+function obosInfo(s){
+  if(!s)return{key:null,n:0};
+  if(s.obos==="OVERBOUGHT")return _obosRes("OB",s.obos_n||1);
+  if(s.obos==="OVERSOLD") return _obosRes("OS",s.obos_n||1);
+  if(s.obos==="NEUTRAL")  return{key:null,n:0};
+  // fallback cho signals.js cũ (chưa có trường obos từ server)
+  let ob=0,os=0;
+  if(s.rsi!=null){if(s.rsi>=70)ob++;if(s.rsi<=30)os++;}
+  if(s.stoch_k!=null){if(s.stoch_k>=80)ob++;if(s.stoch_k<=20)os++;}
+  if(s.pctb!=null){if(s.pctb>=0.95)ob++;if(s.pctb<=0.05)os++;}
+  const obOK=(s.rsi!=null&&s.rsi>=70)||ob>=2;
+  const osOK=(s.rsi!=null&&s.rsi<=30)||os>=2;
+  if(obOK&&ob>=os)return _obosRes("OB",ob);
+  if(osOK)return _obosRes("OS",os);
+  return{key:null,n:0};
+}
+function _obosRes(key,n){
+  return key==="OB"
+    ?{key:"OB",n,label:n>=2?"Quá mua mạnh":"Quá mua",cls:"ob"+(n>=2?" strong":"")}
+    :{key:"OS",n,label:n>=2?"Quá bán mạnh":"Quá bán",cls:"os"+(n>=2?" strong":"")};
+}
+function obosBadge(s){
+  const o=obosInfo(s);
+  if(!o.key)return `<span class="muted small">—</span>`;
+  const tip=o.key==="OB"
+    ?"Vùng QUÁ MUA: đà tăng đã căng, rủi ro điều chỉnh ngắn hạn — cân nhắc chốt lời, tránh mua đuổi."
+    :"Vùng QUÁ BÁN: bị bán quá đà — theo dõi tín hiệu đảo chiều để canh mua.";
+  return `<span class="badge obos ${o.cls}" title="${tip}">${o.label}</span>`;
+}
+
 /* ── Tin vĩ mô (Gemini) + phân tích đồng thuận với tín hiệu kỹ thuật ── */
 const SENT_CLS={"TÍCH CỰC":"buy","TIÊU CỰC":"sell","TRUNG LẬP":"hold"};
 const SENT_VI ={"TÍCH CỰC":"Tích cực","TIÊU CỰC":"Tiêu cực","TRUNG LẬP":"Trung lập"};
@@ -631,12 +665,13 @@ function meterHTML(score){
     <div class="meter-labels"><span>Bán −1</span><span>0</span><span>+1 Mua</span></div></div>`;
 }
 function groupBarsHTML(sig){
+  const W=(sig&&sig.w)||{trend:.276,mom:.281,vol:.095,volume:.173,str:.175};
   const groups=[
-    ["Xu hướng",  sig.s_trend,  .276],
-    ["Động lượng",sig.s_mom,    .281],
-    ["Biến động", sig.s_vol,    .095],
-    ["Khối lượng",sig.s_volume, .173],
-    ["Sức mạnh",  sig.s_str,    .175],
+    ["Xu hướng",  sig.s_trend,  W.trend],
+    ["Động lượng",sig.s_mom,    W.mom],
+    ["Biến động", sig.s_vol,    W.vol],
+    ["Khối lượng",sig.s_volume, W.volume],
+    ["Sức mạnh",  sig.s_str,    W.str],
   ];
   return `<div class="gbars">`+groups.map(([n,v,w])=>{
     if(v==null)return"";
@@ -672,7 +707,8 @@ function renderTable(){
   });
 
   // Lọc
-  if(tFilter!=="ALL") rows=rows.filter(r=>r.signal===tFilter);
+  if(tFilter==="OB"||tFilter==="OS") rows=rows.filter(r=>obosInfo(r).key===tFilter);
+  else if(tFilter!=="ALL") rows=rows.filter(r=>r.signal===tFilter);
   if(tSector!=="ALL") rows=rows.filter(r=>r.sector===tSector);
   if(tSearch) rows=rows.filter(r=>r.sym.includes(tSearch.toUpperCase())||r.name.includes(tSearch));
 
@@ -688,6 +724,12 @@ function renderTable(){
   const nSell=rows.filter(r=>r.signal==="SELL").length;
   const allBuy=Object.values(allSigs).filter(s=>s.signal==="BUY").length;
   const allSell=Object.values(allSigs).filter(s=>s.signal==="SELL").length;
+  const allOB=Object.values(allSigs).filter(s=>obosInfo(s).key==="OB").length;
+  const allOS=Object.values(allSigs).filter(s=>obosInfo(s).key==="OS").length;
+  const MKT=E.market;
+  const mktBadge=MKT?(MKT.regime==="UP"?`<span style="color:var(--buy);font-weight:700" title="VN-Index ${MKT.close??""} > SMA50 ${MKT.sma50??""} — ngưỡng MUA nới xuống 0.22, BÁN chặt hơn -0.28">VN-Index: XU HƯỚNG TĂNG</span>`
+    :MKT.regime==="DOWN"?`<span style="color:var(--sell);font-weight:700" title="VN-Index ${MKT.close??""} < SMA50 ${MKT.sma50??""} — ngưỡng MUA nâng lên 0.30, BÁN nhạy hơn -0.20">VN-Index: XU HƯỚNG GIẢM</span>`
+    :`<span style="color:var(--hold);font-weight:700" title="VN-Index đi ngang quanh SMA50 — ngưỡng chuẩn ±0.25">VN-Index: ĐI NGANG</span>`):"";
 
   const sectorOpts=`<option value="ALL">Tất cả ngành</option>`+
     sectors.map(s=>`<option value="${s}" ${s===tSector?"selected":""}>${s}</option>`).join("");
@@ -701,7 +743,7 @@ function renderTable(){
       const secBuy=secRows.filter(x=>x.signal==="BUY").length;
       const secSell=secRows.filter(x=>x.signal==="SELL").length;
       body+=`<tr class="sector-header-row">
-        <td colspan="11" style="background:var(--panel2);padding:6px 12px;font-weight:600;font-size:12px;color:var(--accent);border-top:2px solid var(--border)">
+        <td colspan="12" style="background:var(--panel2);padding:6px 12px;font-weight:600;font-size:12px;color:var(--accent);border-top:2px solid var(--border)">
           ${curSec}
           <span style="font-weight:400;color:var(--muted);margin-left:8px">${secRows.length} mã</span>
           ${secBuy?`<span class="badge buy" style="margin-left:6px;font-size:10px">${secBuy} MUA</span>`:""}
@@ -715,6 +757,7 @@ function renderTable(){
     <td class="mono">${fmt0(r.close)}</td>
     <td class="mono" style="color:${(r.chg_pct||0)>=0?CO.buy:CO.sell}">${(r.chg_pct||0)>=0?"+":""}${(r.chg_pct||0).toFixed(2)}%</td>
     <td>${badge(r.signal)}</td>
+    <td>${obosBadge(r)}</td>
     <td>${newsBadge(r.news?.sentiment)}</td>
     <td class="mono">${r.score>=0?"+":""}${r.score.toFixed(3)}</td>
     <td class="mono">${r.rsi||"–"}</td>
@@ -729,25 +772,27 @@ function renderTable(){
     <div class="row-between" style="margin-bottom:10px">
       <div>
         <h2>Bảng tín hiệu — phiên ${ASOF}</h2>
-        <p class="muted">Lọc: ≥${E.liqMin||50} tỷ/phiên | Tổng thị trường: ${allBuy} MUA · ${allSell} BÁN · ${syms.length-allBuy-allSell} GIỮ · Điểm = WFO(40%)+IC(35%)+GS(25%)</p>
+        <p class="muted">${mktBadge?mktBadge+" | ":""}Lọc: ≥${E.liqMin||50} tỷ/phiên | ${allBuy} MUA · ${allSell} BÁN · ${syms.length-allBuy-allSell} GIỮ | <span style="color:var(--sell);font-weight:600">${allOB} quá mua</span> · <span style="color:var(--buy);font-weight:600">${allOS} quá bán</span><br>Tín hiệu = 100% kỹ thuật, trọng số tối ưu theo ngành (WFO 40%+IC 35%+GS 25%) · điểm làm mượt 3 phiên · ngưỡng MUA/BÁN thích ứng theo xu hướng VN-Index · cơ bản KHÔNG vào điểm</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <input class="search-box" id="tbl-search" placeholder="Tìm mã…" value="${tSearch}"
                oninput="APP.setSearch(this.value)">
         <select class="sel sm" onchange="APP.setSector(this.value)">${sectorOpts}</select>
         <div class="seg sm">
-          ${["ALL","BUY","SELL"].map(f=>`<button class="${tFilter===f?"on":""}" onclick="APP.setFilter('${f}')">${f==="ALL"?"Tất cả":SIG_VI[f]}</button>`).join("")}
+          ${["ALL","BUY","SELL","OB","OS"].map(f=>{const lbl=f==="ALL"?"Tất cả":f==="OB"?"Quá mua":f==="OS"?"Quá bán":SIG_VI[f];return `<button class="${tFilter===f?"on":""}" onclick="APP.setFilter('${f}')">${lbl}</button>`;}).join("")}
         </div>
       </div>
     </div>
     <div class="card" style="padding:0;overflow:hidden">
       <table class="grid">
-        <thead><tr><th>Mã</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th>
-          <th>Tin vĩ mô</th><th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản</th><th>P/E</th><th>GTGD</th></tr></thead>
-        <tbody>${body||`<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
+        <thead><tr><th>Mã</th><th>Giá</th><th>+/−</th><th>Tín hiệu</th><th>Trạng thái</th>
+          <th>Tin vĩ mô</th><th>Điểm</th><th>RSI</th><th>Tin cậy</th><th>Cơ bản*</th><th>P/E</th><th>GTGD</th></tr></thead>
+        <tbody>${body||`<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted)">Không có mã nào phù hợp bộ lọc</td></tr>`}</tbody>
       </table>
     </div>
-    <p class="muted small">Hiển thị ${rows.length}/${syms.length} mã. Nhấp một dòng để xem chi tiết biểu đồ nến & phân tích.</p>`;
+    <p class="muted small">Hiển thị ${rows.length}/${syms.length} mã. Nhấp một dòng để xem chi tiết biểu đồ nến & phân tích.<br>
+    Trạng thái = Quá mua/Quá bán theo RSI(14) ≥70/≤30, Stoch %K(14) ≥80/≤20, Bollinger %B ≥0.95/≤0.05 — từ 2 chỉ báo đồng thuận = "mạnh".<br>
+    * Xếp hạng Cơ bản (A–F) chỉ để tham khảo sức khoẻ tài chính, KHÔNG phải tiêu chí mua/bán.</p>`;
 }
 
 /* ============ 2) PHÂN TÍCH MÃ ============ */
@@ -776,14 +821,19 @@ function renderDetail(){
 
     <div class="grid3">
       <div class="card verdict ${SIG_CLS[signalVal]}">
-        <div class="muted">Tín hiệu tổng hợp — ${ASOF}</div>
+        <div class="muted">Tín hiệu kỹ thuật (100% kỹ thuật, không gồm cơ bản) — ${ASOF}</div>
         <div class="verdict-big"><span class="badge ${SIG_CLS[signalVal]}">${SIG_VI[signalVal]}</span>
           <span class="mono vscore">${scoreVal>=0?"+":""}${scoreVal.toFixed(3)}</span></div>
         ${meterHTML(scoreVal)}
+        ${(()=>{const o=obosInfo(sig);if(!o.key)return"";
+          const ob=o.key==="OB";
+          return `<div style="margin:10px 0 4px;padding:10px 12px;border-radius:8px;border:1px solid ${ob?"rgba(229,72,77,.5)":"rgba(45,190,139,.5)"};background:${ob?"rgba(229,72,77,.08)":"rgba(45,190,139,.08)"};font-size:12.5px;line-height:1.55">${obosBadge(sig)} ${ob
+            ?`Giá đang ở vùng <b>QUÁ MUA</b> (${o.n} chỉ báo xác nhận). Thị trường biến động mạnh, rủi ro điều chỉnh ngắn hạn cao — cân nhắc chốt lời một phần, không mua đuổi.`
+            :`Giá đang ở vùng <b>QUÁ BÁN</b> (${o.n} chỉ báo xác nhận). Áp lực bán có thể đã quá đà — theo dõi tín hiệu đảo chiều (RSI cắt lên 30, nến rút chân) để canh mua.`}</div>`;})()}
         ${sig?groupBarsHTML(sig):""}
       </div>
       <div class="card">
-        <div class="muted" style="margin-bottom:10px">Sức khoẻ tài chính</div>
+        <div class="muted" style="margin-bottom:10px">Sức khoẻ tài chính — <b>chỉ tham khảo</b>, KHÔNG vào tín hiệu mua/bán</div>
         <div class="fund-header">${fundBadge(grade)} <span class="fund-desc">${grade.desc}</span></div>
         <div class="fund-kpis">
           ${fKpi("P/E",fund.pe,v=>v<10?"Rẻ":v<20?"Hợp lý":"Đắt",v=>v<10?CO.buy:v<20?CO.amber:CO.sell)}
@@ -801,6 +851,8 @@ function renderDetail(){
           ${kpi("RSI (14)",sig?.rsi||"–",sig?.rsi<30?"Quá bán":sig?.rsi>70?"Quá mua":"Trung tính",sig?.rsi<30?CO.buy:sig?.rsi>70?CO.sell:null)}
           ${kpi("ADX (14)",sig?.adx||"–",sig?.adx>25?"Xu hướng mạnh":"Đi ngang",sig?.adx>25?CO.accent:null)}
           ${kpi("MACD hist",sig?.macd_hist||"–",sig?.macd_hist>0?"Dương":"Âm",sig?.macd_hist>0?CO.buy:CO.sell)}
+          ${kpi("Stoch %K (14)",sig?.stoch_k!=null?sig.stoch_k:"–",sig?.stoch_k!=null?(sig.stoch_k>=80?"Quá mua":sig.stoch_k<=20?"Quá bán":"Trung tính"):"",sig?.stoch_k>=80?CO.sell:sig?.stoch_k<=20?CO.buy:null)}
+          ${kpi("BB %B",sig?.pctb!=null?sig.pctb.toFixed(2):"–",sig?.pctb!=null?(sig.pctb>=0.95?"Chạm dải trên":sig.pctb<=0.05?"Chạm dải dưới":"Trong dải"):"",sig?.pctb>=0.95?CO.sell:sig?.pctb<=0.05?CO.buy:null)}
         </div>
       </div>
     </div>
@@ -862,8 +914,9 @@ function renderBacktest(){
   const sig=E.getSignal(btSym);
   const sigArr=e.close.map((_,i)=>{
     if(i<50||e.sma20[i]==null)return"HOLD";
-    const sc=(sig?.s_trend||0)*0.276+(sig?.s_mom||0)*0.281+(sig?.s_vol||0)*0.095
-            +(sig?.s_volume||0)*0.173+(sig?.s_str||0)*0.175;
+    const W=(sig&&sig.w)||{trend:.276,mom:.281,vol:.095,volume:.173,str:.175};
+    const sc=(sig?.s_trend||0)*W.trend+(sig?.s_mom||0)*W.mom+(sig?.s_vol||0)*W.vol
+            +(sig?.s_volume||0)*W.volume+(sig?.s_str||0)*W.str;
     return sc>=0.25?"BUY":sc<=-0.25?"SELL":"HOLD";
   });
   // Backtest đơn giản
