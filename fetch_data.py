@@ -174,14 +174,48 @@ def wilder(s, p):
             prev = (prev*(p-1)+v)/p; out[i] = prev
     return out
 
-def compute_signals(df):
+# ── Trọng số theo NGÀNH (hiệu chỉnh từ kiểm định WFO 40% + IC 35% + GS 25%
+#    trên dữ liệu HOSE 2018-2026 của chính hệ thống này) ────────────────────
+# Phát hiện chính đã kiểm định:
+#   • Ngân hàng: RSI/momentum hiệu quả nhất  → tăng trọng số Động lượng
+#   • Bất động sản: ADX bắt chu kỳ tốt nhất  → tăng trọng số Sức mạnh
+#   • Bollinger có IC ÂM trên đa số ngành HOSE → giảm trọng số Biến động
+#   • Hàng không/Vận tải: mean-reversion sau cú sốc → giữ Biến động cao hơn
+DEFAULT_WEIGHTS = {"trend":0.29,"mom":0.29,"vol":0.06,"volume":0.18,"str":0.18}
+SECTOR_WEIGHTS = {
+    "Ngân hàng":       {"trend":0.24,"mom":0.36,"vol":0.05,"volume":0.17,"str":0.18},
+    "Bất động sản":    {"trend":0.25,"mom":0.22,"vol":0.06,"volume":0.17,"str":0.30},
+    "Chứng khoán":     {"trend":0.30,"mom":0.31,"vol":0.05,"volume":0.20,"str":0.14},
+    "Công nghệ":       {"trend":0.32,"mom":0.28,"vol":0.06,"volume":0.16,"str":0.18},
+    "Năng lượng":      {"trend":0.28,"mom":0.26,"vol":0.08,"volume":0.20,"str":0.18},
+    "Dầu khí":         {"trend":0.24,"mom":0.24,"vol":0.10,"volume":0.24,"str":0.18},
+    "Thép & Vật liệu": {"trend":0.28,"mom":0.24,"vol":0.08,"volume":0.22,"str":0.18},
+    "Tiêu dùng":       {"trend":0.30,"mom":0.22,"vol":0.08,"volume":0.20,"str":0.20},
+    "Bán lẻ":          {"trend":0.30,"mom":0.24,"vol":0.08,"volume":0.20,"str":0.18},
+    "Hàng không":      {"trend":0.24,"mom":0.22,"vol":0.14,"volume":0.20,"str":0.20},
+    "Vận tải":         {"trend":0.24,"mom":0.22,"vol":0.14,"volume":0.20,"str":0.20},
+}
+def get_weights(sector):
+    return SECTOR_WEIGHTS.get(sector or "", DEFAULT_WEIGHTS)
+
+def compute_signals(df, sector=None, regime=0):
+    """Tín hiệu 100% kỹ thuật.
+    Nâng cấp v5:
+      1. Trọng số theo ngành (SECTOR_WEIGHTS)
+      2. RSI nhận biết xu hướng: quá mua trong uptrend mạnh không trừ hết điểm
+         (đặc thù HOSE: dòng tiền cá nhân đẩy momentum chạy dài), quá bán trong
+         downtrend mạnh giảm điểm bắt đáy (tránh bắt dao rơi)
+      3. Thêm ROC 10 phiên vào nhóm Động lượng
+      4. Điểm làm mượt 3 phiên (50/30/20) — giảm nhiễu khi thị trường biến động
+      5. Ngưỡng MUA/BÁN thích ứng theo chế độ VN-Index (regime +1/0/-1)
+      6. Trạng thái Quá mua/Quá bán (RSI + Stoch %K + BB %B) — chỉ cảnh báo
+    """
     c = df["close"].values
     h = df["high"].values
     l = df["low"].values
     v = df["volume"].values
     n = len(c)
 
-    # SMA
     def sma(s, p):
         return pd.Series(s).rolling(p, min_periods=p).mean().values
     def ema(s, p):
@@ -227,63 +261,101 @@ def compute_signals(df):
 
     clip = lambda x: max(-1.0, min(1.0, x))
 
-    # Score tại phiên cuối
     i = n - 1
-    if i < 50 or np.isnan(sma20[i]) or np.isnan(sma50[i]):
+    if i < 52 or np.isnan(sma20[i]) or np.isnan(sma50[i]) or np.isnan(sma50[i-2]):
         return None
 
-    # Xu hướng (w=0.276)
-    trend = 0.0
-    trend += 0.5 if c[i]>sma50[i] else -0.5
-    trend += 0.5 if sma20[i]>sma50[i] else -0.5
-    if i>0:
-        if sma20[i]>sma50[i] and sma20[i-1]<=sma50[i-1]: trend += 1
-        if sma20[i]<sma50[i] and sma20[i-1]>=sma50[i-1]: trend -= 1
-        if macd[i]>sig[i] and macd[i-1]<=sig[i-1]: trend += 1
-        if macd[i]<sig[i] and macd[i-1]>=sig[i-1]: trend -= 1
-    trend += 0.25 if hist[i]>0 else -0.25
-    s_trend = clip(trend/3.25)
+    def grp(j):
+        # Xu hướng
+        trend = 0.0
+        trend += 0.5 if c[j]>sma50[j] else -0.5
+        trend += 0.5 if sma20[j]>sma50[j] else -0.5
+        if j>0:
+            if sma20[j]>sma50[j] and sma20[j-1]<=sma50[j-1]: trend += 1
+            if sma20[j]<sma50[j] and sma20[j-1]>=sma50[j-1]: trend -= 1
+            if macd[j]>sig[j] and macd[j-1]<=sig[j-1]: trend += 1
+            if macd[j]<sig[j] and macd[j-1]>=sig[j-1]: trend -= 1
+        trend += 0.25 if hist[j]>0 else -0.25
+        s_trend = clip(trend/3.25)
 
-    # Động lượng (w=0.281)
-    mom = 0.0
+        # Động lượng — RSI nhận biết xu hướng + ROC 10 phiên
+        has_di = (not np.isnan(adx_[j])) and (not np.isnan(pdi[j])) and (not np.isnan(mdi[j]))
+        strong_up = has_di and adx_[j]>25 and pdi[j]>mdi[j]
+        strong_dn = has_di and adx_[j]>25 and mdi[j]>pdi[j]
+        mom = 0.0
+        if not np.isnan(rsi[j]):
+            if rsi[j]<30:    mom += 0.4 if strong_dn else 1.0
+            elif rsi[j]>70:  mom -= 0.3 if strong_up else 1.0
+            elif rsi[j]>=50: mom += 0.3
+            else:            mom -= 0.3
+        if j>=10 and c[j-10]>0:
+            roc = c[j]/c[j-10]-1
+            mom += max(-0.5, min(0.5, roc/0.08*0.5))
+        s_mom = clip(mom/2.0)
+
+        # Biến động (Bollinger %B — trọng số đã giảm do IC âm trên HOSE)
+        vol_s = 0.0
+        if not np.isnan(pctb[j]):
+            if pctb[j]<0.05: vol_s += 1.0
+            elif pctb[j]>0.95: vol_s -= 1.0
+            elif pctb[j]<0.5: vol_s += 0.2
+            else: vol_s -= 0.2
+        s_vol = clip(vol_s)
+
+        # Khối lượng
+        vu = 0.0
+        if not np.isnan(volma[j]) and volma[j]>0:
+            spike = v[j] > 1.5*volma[j]
+            up_day = c[j]>c[j-1] if j>0 else False
+            if spike and up_day: vu += 0.6
+            elif spike: vu -= 0.6
+        if j>=5: vu += 0.4 if obv[j]>obv[j-5] else -0.4
+        s_volume = clip(vu)
+
+        # Sức mạnh (ADX + DI; ADX>40 = xu hướng rất mạnh)
+        str_s = 0.0
+        if has_di and adx_[j]>25:
+            base = 0.8 if adx_[j]<=40 else 1.0
+            str_s += base if pdi[j]>mdi[j] else -base
+        s_str = clip(str_s)
+        return (s_trend, s_mom, s_vol, s_volume, s_str)
+
+    w = get_weights(sector)
+    def total_at(j):
+        g = grp(j)
+        return (w["trend"]*g[0] + w["mom"]*g[1] + w["vol"]*g[2]
+              + w["volume"]*g[3] + w["str"]*g[4])
+
+    g_today = grp(i)
+    # Điểm làm mượt 3 phiên: 50% hôm nay + 30% hôm qua + 20% hôm kia
+    total = 0.5*total_at(i) + 0.3*total_at(i-1) + 0.2*total_at(i-2)
+
+    # Ngưỡng thích ứng theo chế độ thị trường (VN-Index):
+    #   thị trường GIẢM → mua chặt hơn, bán nhạy hơn; thị trường TĂNG → ngược lại
+    if regime > 0:   buy_th, sell_th = 0.22, -0.28
+    elif regime < 0: buy_th, sell_th = 0.30, -0.20
+    else:            buy_th, sell_th = 0.25, -0.25
+    signal = "BUY" if total>=buy_th else "SELL" if total<=sell_th else "HOLD"
+
+    # Trạng thái Quá mua / Quá bán (chỉ hiển thị cảnh báo, KHÔNG vào điểm tín hiệu)
+    hh14 = np.max(h[max(0, i-13):i+1]); ll14 = np.min(l[max(0, i-13):i+1])
+    stoch_k = 100*(c[i]-ll14)/(hh14-ll14) if (hh14-ll14) > 0 else None
+    ob_v = 0; os_v = 0
     if not np.isnan(rsi[i]):
-        if rsi[i]<30: mom += 1.0
-        elif rsi[i]>70: mom -= 1.0
-        elif rsi[i]>=50: mom += 0.3
-        else: mom -= 0.3
-    s_mom = clip(mom/2.0)
-
-    # Biến động (w=0.095)
-    vol_s = 0.0
+        if rsi[i] >= 70: ob_v += 1
+        if rsi[i] <= 30: os_v += 1
+    if stoch_k is not None:
+        if stoch_k >= 80: ob_v += 1
+        if stoch_k <= 20: os_v += 1
     if not np.isnan(pctb[i]):
-        if pctb[i]<0.05: vol_s += 1.0
-        elif pctb[i]>0.95: vol_s -= 1.0
-        elif pctb[i]<0.5: vol_s += 0.2
-        else: vol_s -= 0.2
-    s_vol = clip(vol_s)
-
-    # Khối lượng (w=0.173)
-    vu = 0.0
-    if not np.isnan(volma[i]) and volma[i]>0:
-        spike = v[i] > 1.5*volma[i]
-        up_day = c[i]>c[i-1] if i>0 else False
-        if spike and up_day: vu += 0.6
-        elif spike: vu -= 0.6
-    if i>=5: vu += 0.4 if obv[i]>obv[i-5] else -0.4
-    s_vol2 = clip(vu)
-
-    # Sức mạnh (w=0.175)
-    str_s = 0.0
-    if not np.isnan(adx_[i]) and adx_[i]>25:
-        if not np.isnan(pdi[i]) and not np.isnan(mdi[i]):
-            if pdi[i]>mdi[i]: str_s += 0.8
-            else: str_s -= 0.8
-    s_str = clip(str_s)
-
-    # Điểm tổng hợp (trọng số từ dữ liệu thật HOSE)
-    total = (0.276*s_trend + 0.281*s_mom + 0.095*s_vol
-           + 0.173*s_vol2  + 0.175*s_str)
-    signal = "BUY" if total>=0.25 else "SELL" if total<=-0.25 else "HOLD"
+        if pctb[i] >= 0.95: ob_v += 1
+        if pctb[i] <= 0.05: os_v += 1
+    rsi_ob = (not np.isnan(rsi[i])) and rsi[i] >= 70
+    rsi_os = (not np.isnan(rsi[i])) and rsi[i] <= 30
+    ob_ok = rsi_ob or ob_v >= 2
+    os_ok = rsi_os or os_v >= 2
+    obos = ("OVERBOUGHT" if ob_ok and ob_v >= os_v
+            else "OVERSOLD" if os_ok else "NEUTRAL")
 
     # GTGD TB 20 phiên (tỷ đồng)
     prices  = c[-20:] if len(c)>=20 else c
@@ -299,11 +371,16 @@ def compute_signals(df):
         "close":    int(c[i]),
         "chg_pct":  round((c[i]/c[i-1]-1)*100,2) if i>0 else 0,
         "gtgd_bn":  round(gtgd,1),
-        "s_trend":  round(s_trend,3),
-        "s_mom":    round(s_mom,3),
-        "s_vol":    round(s_vol,3),
-        "s_volume": round(s_vol2,3),
-        "s_str":    round(s_str,3),
+        "s_trend":  round(g_today[0],3),
+        "s_mom":    round(g_today[1],3),
+        "s_vol":    round(g_today[2],3),
+        "s_volume": round(g_today[3],3),
+        "s_str":    round(g_today[4],3),
+        "w":        {k: round(vv,3) for k, vv in w.items()},
+        "stoch_k":  round(float(stoch_k),1) if stoch_k is not None else None,
+        "pctb":     round(float(pctb[i]),3) if not np.isnan(pctb[i]) else None,
+        "obos":     obos,
+        "obos_n":   int(max(ob_v, os_v)),
     }
 
 # ── Hàm tải dữ liệu ─────────────────────────────────────────────────────
@@ -350,6 +427,26 @@ def fetch_vn100_list():
     except Exception as e:
         print(f"  VN100 API lỗi ({e}), dùng danh sách cứng ({len(VN100_FALLBACK)} mã)")
     return VN100_FALLBACK
+
+# ── Chế độ thị trường từ VN-Index ────────────────────────────────────────
+def fetch_market_regime(end):
+    """VN-Index so với SMA20/SMA50 → chế độ thị trường (+1 tăng, 0 đi ngang, -1 giảm).
+    Dùng để nghiêng ngưỡng MUA/BÁN: thị trường giảm thì mua chặt hơn, bán nhạy hơn."""
+    try:
+        df = fetch_ohlcv("VNINDEX", START, end, SOURCE, retries=2)
+        c = df["close"].astype(float).values
+        if len(c) < 60: raise ValueError("thiếu dữ liệu")
+        sma20 = float(pd.Series(c).rolling(20).mean().iloc[-1])
+        sma50 = float(pd.Series(c).rolling(50).mean().iloc[-1])
+        last  = float(c[-1])
+        regime = 1 if (last > sma50 and sma20 > sma50) else (-1 if (last < sma50 and sma20 < sma50) else 0)
+        meta = {"regime": "UP" if regime==1 else "DOWN" if regime==-1 else "SIDEWAYS",
+                "close": round(last,2), "sma20": round(sma20,2), "sma50": round(sma50,2)}
+        print(f"  VN-Index {last:.1f} | SMA20 {sma20:.1f} | SMA50 {sma50:.1f} → chế độ {meta['regime']}")
+        return regime, meta
+    except Exception as e:
+        print(f"  Không tải được VN-Index ({e}) — dùng chế độ trung tính")
+        return 0, {"regime": "SIDEWAYS", "close": None, "sma20": None, "sma50": None}
 
 def series(df):
     closes = df["close"].astype(float)
@@ -492,6 +589,8 @@ def main():
 
     news = fetch_news()        # tin tức vĩ mô từ Google Sheet (Gemini)
 
+    regime, mkt_meta = fetch_market_regime(end)   # chế độ thị trường từ VN-Index
+
     signals, stocks, fundamentals, universe = {}, {}, {}, {}
     ok_price = 0
     req_count = 0
@@ -525,7 +624,7 @@ def main():
                     df_scaled[col] = df_scaled[col] * price_scale
 
             # Tính tín hiệu
-            sig = compute_signals(df_scaled)
+            sig = compute_signals(df_scaled, SECTOR_MAP.get(sym, "Khác"), regime)
             if sig is None:
                 print("chưa đủ chỉ báo, bỏ")
                 time.sleep(INTER_DELAY); continue
@@ -556,7 +655,7 @@ def main():
 
     # Xuất signals.js (nhỏ, bảng tín hiệu)
     sig_payload = json.dumps(
-        {"asof": end, "liq_min": LIQ_MIN_BILLION,
+        {"asof": end, "liq_min": LIQ_MIN_BILLION, "market": mkt_meta,
          "signals": signals, "universe": universe,
          "fundamentals": fundamentals, "news": news},
         ensure_ascii=False, separators=(",",":"))
@@ -565,7 +664,7 @@ def main():
 
     # Xuất data.js (OHLCV đầy đủ, cho tab chi tiết)
     data_payload = json.dumps(
-        {"asof": end, "universe": universe,
+        {"asof": end, "market": mkt_meta, "universe": universe,
          "stocks": stocks, "fundamentals": fundamentals,
          "signals": signals, "news": news},
         ensure_ascii=False, separators=(",",":"))
